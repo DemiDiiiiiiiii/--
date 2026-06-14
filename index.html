@@ -5,221 +5,381 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>拾遗</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&display=swap');
+
 :root {
-  --paper: #f7f3ec;
-  --ink: #2b2926;
-  --ink-soft: #6b645c;
-  --line: #ddd6cc;
-  --accent: #8a6d4b;
-  --panel-bg: #f0ebe0;
+  --paper:    #f5f0e8;
+  --paper-2:  #ede8dc;
+  --ink:      #1e1c19;
+  --ink-mid:  #4a4540;
+  --ink-soft: #8c8479;
+  --line:     #d8d0c4;
+  --accent:   #7a5c3a;
+  --accent-l: #c4a882;
+  --gold:     #9e7e4e;
 }
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-  font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
   background: var(--paper);
   color: var(--ink);
-  line-height: 1.9;
-  padding-bottom: 72px;
+  line-height: 2;
+  padding-bottom: 80px;
+  min-height: 100vh;
 }
+
+/* ── 页头 ── */
 header {
-  padding: 24px 20px 14px;
+  padding: 36px 24px 20px;
   text-align: center;
   border-bottom: 1px solid var(--line);
+  background: var(--paper);
 }
-header h1 { font-size: 22px; font-weight: 500; letter-spacing: 0.35em; }
-header p { font-size: 12px; color: var(--ink-soft); letter-spacing: 0.12em; margin-top: 4px; }
+header h1 {
+  font-size: 34px;
+  font-weight: 300;
+  letter-spacing: 0.6em;
+  color: var(--ink);
+  text-indent: 0.6em;
+  margin-bottom: 4px;
+}
+header .sub {
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+}
+header .sub span { margin: 0 6px; }
 
+/* ── 底部导航 ── */
 nav {
   position: fixed; bottom: 0; left: 0; right: 0;
-  display: flex; background: var(--paper);
-  border-top: 1px solid var(--line); z-index: 10;
+  display: flex;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  z-index: 100;
 }
 nav button {
   flex: 1; background: none; border: none;
-  padding: 12px 0; font-family: inherit;
-  font-size: 14px; color: var(--ink-soft);
-  letter-spacing: 0.2em; cursor: pointer;
+  padding: 13px 0 11px;
+  font-family: inherit; font-size: 13px;
+  color: var(--ink-soft); letter-spacing: 0.25em;
+  cursor: pointer; transition: color 0.2s;
 }
 nav button.active {
-  color: var(--ink);
-  border-top: 2px solid var(--accent);
+  color: var(--accent);
+  border-top: 1.5px solid var(--accent);
   margin-top: -1px;
 }
 
-main { max-width: 640px; margin: 0 auto; padding: 16px; }
+/* ── 主区域 ── */
+main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
 .view { display: none; }
 .view.active { display: block; }
 
-/* 卡片 */
+/* ── 卡片 ── */
 .card {
-  background: #fffdf9;
+  background: #faf6ee;
   border: 1px solid var(--line);
-  border-radius: 4px;
-  padding: 18px 20px;
-  margin-bottom: 14px;
+  border-radius: 2px;
+  padding: 22px 22px 16px;
+  margin-bottom: 16px;
+  position: relative;
 }
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 16px; bottom: 16px;
+  width: 2px;
+  background: var(--line);
+  border-radius: 1px;
+}
+.card.word::before { background: var(--accent-l); }
+
 .card .content {
-  font-size: 17px;
+  font-size: 19px;
   white-space: pre-wrap;
   word-break: break-word;
-  line-height: 2;
+  line-height: 2.1;
+  color: var(--ink);
+  font-weight: 400;
 }
-.card.word .content { font-size: 20px; letter-spacing: 0.08em; }
-.card .note { margin-top: 8px; font-size: 13px; color: var(--ink-soft); white-space: pre-wrap; }
-.card .source { margin-top: 6px; font-size: 12px; color: var(--accent); text-align: right; }
-.card .tags { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+.card.word .content {
+  font-size: 24px;
+  letter-spacing: 0.12em;
+  font-weight: 300;
+}
+.card .note {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  line-height: 1.8;
+  padding-left: 1em;
+  border-left: 2px solid var(--line);
+}
+.card .source {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--gold);
+  text-align: right;
+  letter-spacing: 0.08em;
+}
+.card .tags {
+  margin-top: 8px;
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
 .card .tag {
   font-size: 11px; color: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 10px; padding: 1px 8px;
-  cursor: pointer;
+  border: 1px solid var(--accent-l);
+  border-radius: 20px; padding: 1px 10px;
+  cursor: pointer; letter-spacing: 0.05em;
+  background: transparent;
+  transition: background 0.15s;
 }
+.card .tag:hover { background: #f0e8d8; }
+
+/* ── 操作栏 ── */
 .card .actions {
-  margin-top: 12px; display: flex; gap: 16px;
-  font-size: 12px; color: var(--ink-soft);
-  flex-wrap: wrap;
+  margin-top: 14px;
+  display: flex; gap: 0;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
 }
 .card .actions span {
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.15em;
   cursor: pointer;
-  border-bottom: 1px dotted var(--ink-soft);
-  padding-bottom: 1px;
+  padding: 2px 12px 2px 0;
+  transition: color 0.15s;
 }
-.card .actions span.active-action { color: var(--accent); border-color: var(--accent); }
+.card .actions span:hover { color: var(--accent); }
+.card .actions span.active-action { color: var(--accent); }
+.card .actions .action-right {
+  margin-left: auto;
+  display: flex; gap: 0;
+}
+.card .actions .action-right span {
+  color: var(--line);
+  padding: 2px 0 2px 10px;
+  font-size: 11px;
+}
+.card .actions .action-right span:hover { color: var(--ink-soft); }
 
-/* AI面板 */
-.ai-panel {
-  margin-top: 10px; padding: 12px 14px;
-  background: var(--panel-bg); border-radius: 4px;
-  font-size: 13px; color: var(--ink);
-  white-space: pre-wrap; display: none;
+/* ── 综合面板（溯源+试问+笔记连贯区） ── */
+.combined-panel {
+  display: none;
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+.combined-panel.show { display: block; }
+
+/* 溯源内容 */
+.ety-content {
+  font-size: 13.5px;
+  color: var(--ink-mid);
+  line-height: 1.9;
+  white-space: pre-wrap;
+  min-height: 20px;
+}
+.ety-content.loading { color: var(--ink-soft); font-style: italic; }
+
+/* 溯源下方的操作区 */
+.panel-actions {
+  margin-top: 12px;
+  display: flex; gap: 10px;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+.panel-tab {
+  font-size: 12px; color: var(--ink-soft);
+  cursor: pointer; letter-spacing: 0.1em;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  transition: all 0.15s;
+}
+.panel-tab.active { color: var(--accent); border-color: var(--accent); }
+
+/* 试问和笔记的输入区 */
+.panel-input-area { margin-top: 10px; }
+.panel-input-area textarea {
+  width: 100%;
+  font-family: inherit; font-size: 13px;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  padding: 6px 0;
+  background: transparent;
+  color: var(--ink);
+  resize: none;
+  line-height: 1.8;
+  outline: none;
+}
+.panel-input-area textarea:focus { border-color: var(--accent-l); }
+.panel-input-area textarea::placeholder { color: var(--ink-soft); font-size: 12px; }
+.panel-submit {
+  margin-top: 8px;
+  font-family: inherit; font-size: 12px;
+  border: 1px solid var(--accent-l);
+  background: none; color: var(--accent);
+  border-radius: 2px; padding: 4px 16px;
+  cursor: pointer; letter-spacing: 0.15em;
+  transition: all 0.15s;
+}
+.panel-submit:hover { background: var(--accent); color: #faf6ee; }
+
+/* 试问回答 */
+.ask-answer {
+  margin-top: 10px;
+  font-size: 13.5px; color: var(--ink-mid);
+  line-height: 1.9; white-space: pre-wrap;
+  padding-left: 10px;
+  border-left: 2px solid var(--accent-l);
+}
+.ask-answer a {
+  display: inline-block; margin-top: 6px;
+  font-size: 12px; color: var(--gold);
+  text-decoration: none; letter-spacing: 0.05em;
+}
+.ask-answer a:hover { text-decoration: underline; }
+
+/* 笔记列表 */
+.notes-list { margin-top: 6px; }
+.note-item {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px; color: var(--ink-mid);
   line-height: 1.8;
 }
-.ai-panel.show { display: block; }
-.ai-panel textarea {
-  width: 100%; font-family: inherit; font-size: 13px;
-  border: 1px solid var(--line); border-radius: 4px;
-  padding: 6px 8px; margin-bottom: 8px; resize: vertical;
-  background: #fff; line-height: 1.7;
+.note-item:last-child { border-bottom: none; }
+.note-del {
+  font-size: 11px; color: var(--line);
+  cursor: pointer; flex-shrink: 0;
+  transition: color 0.15s;
 }
-.ai-panel .ask-btn {
-  font-family: inherit; font-size: 12px;
-  border: 1px solid var(--accent); background: none;
-  color: var(--accent); border-radius: 4px;
-  padding: 4px 12px; cursor: pointer;
-  letter-spacing: 0.1em;
-}
-.ai-panel .answer { margin-top: 10px; white-space: pre-wrap; }
+.note-del:hover { color: var(--ink-soft); }
 
-/* 笔记面板 */
-.notes-panel {
-  margin-top: 10px; padding: 12px 14px;
-  background: #faf6ee; border-radius: 4px;
-  border-left: 2px solid var(--accent);
-  display: none;
+/* 标签编辑 */
+.tag-edit-panel { display: none; margin-top: 10px; }
+.tag-edit-panel.show { display: flex; gap: 8px; align-items: center; }
+.tag-edit-panel input {
+  flex: 1; font-family: inherit; font-size: 12px;
+  border: none; border-bottom: 1px solid var(--line);
+  padding: 4px 0; background: transparent;
+  color: var(--ink); outline: none;
 }
-.notes-panel.show { display: block; }
-.note-item {
-  font-size: 13px; color: var(--ink);
-  padding: 6px 0; border-bottom: 1px solid var(--line);
-  display: flex; justify-content: space-between; align-items: flex-start;
-  gap: 8px; white-space: pre-wrap; line-height: 1.7;
-}
-.note-item:last-of-type { border-bottom: none; }
-.note-del { font-size: 11px; color: var(--ink-soft); cursor: pointer; flex-shrink: 0; }
-.note-input-area { margin-top: 8px; display: flex; gap: 8px; }
-.note-input-area textarea {
-  flex: 1; font-family: inherit; font-size: 13px;
-  border: 1px solid var(--line); border-radius: 4px;
-  padding: 6px 8px; resize: none; background: #fff;
-  line-height: 1.7;
-}
-.note-input-area button {
+.tag-edit-panel input:focus { border-color: var(--accent-l); }
+.tag-edit-panel button {
   font-family: inherit; font-size: 12px;
-  border: 1px solid var(--accent); background: none;
-  color: var(--accent); border-radius: 4px;
-  padding: 4px 10px; cursor: pointer; flex-shrink: 0;
+  border: 1px solid var(--accent-l); background: none;
+  color: var(--accent); border-radius: 2px;
+  padding: 3px 10px; cursor: pointer;
 }
 
-/* 邂逅页 */
+/* ── 邂逅页 ── */
 .refresh-btn {
-  display: block; margin: 0 auto 18px;
-  background: none; border: 1px solid var(--accent);
-  color: var(--accent); border-radius: 20px;
-  padding: 6px 24px; font-family: inherit;
-  font-size: 13px; letter-spacing: 0.2em; cursor: pointer;
+  display: block; margin: 4px auto 20px;
+  background: none; border: 1px solid var(--line);
+  color: var(--ink-soft); border-radius: 20px;
+  padding: 6px 28px; font-family: inherit;
+  font-size: 12px; letter-spacing: 0.3em;
+  cursor: pointer; transition: all 0.2s;
 }
-.recite-controls { margin-top: 10px; display: flex; gap: 10px; }
-.recite-controls button {
-  font-family: inherit; font-size: 12px;
+.refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* 听按钮 */
+.listen-area { margin-top: 8px; }
+.listen-btn {
+  font-family: inherit; font-size: 11px;
   border: 1px solid var(--line); background: none;
-  color: var(--ink-soft); border-radius: 4px;
-  padding: 4px 12px; cursor: pointer;
+  color: var(--ink-soft); border-radius: 20px;
+  padding: 2px 14px; cursor: pointer;
+  letter-spacing: 0.15em; transition: all 0.15s;
 }
-.recite-controls button.speaking {
+.listen-btn.speaking {
   border-color: var(--accent); color: var(--accent);
 }
 
-/* 藏书页 */
+/* ── 藏书页 ── */
 .shelf-bar {
-  display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+  display: flex; gap: 8px; margin-bottom: 16px;
 }
 .shelf-bar input {
-  flex: 1; min-width: 120px; font-family: inherit; font-size: 14px;
-  padding: 8px 12px; border: 1px solid var(--line);
-  border-radius: 4px; background: #fffdf9;
+  flex: 1; font-family: inherit; font-size: 14px;
+  padding: 8px 0; border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent; color: var(--ink);
+  outline: none; letter-spacing: 0.05em;
 }
-.shelf-bar select, .shelf-bar button {
-  font-family: inherit; font-size: 13px;
-  padding: 8px 10px; border: 1px solid var(--line);
-  border-radius: 4px; background: #fffdf9; color: var(--ink);
-  cursor: pointer;
+.shelf-bar input:focus { border-color: var(--accent-l); }
+.shelf-bar input::placeholder { color: var(--ink-soft); font-size: 13px; }
+.shelf-bar select {
+  font-family: inherit; font-size: 12px;
+  border: 1px solid var(--line); border-radius: 2px;
+  background: transparent; color: var(--ink-soft);
+  padding: 4px 6px; cursor: pointer;
+}
+.shelf-bar button {
+  font-family: inherit; font-size: 12px;
+  border: 1px solid var(--accent-l); border-radius: 2px;
+  background: none; color: var(--accent);
+  padding: 4px 14px; cursor: pointer;
+  letter-spacing: 0.15em;
 }
 .shelf-pagination {
-  display: flex; justify-content: center;
-  gap: 14px; margin-top: 16px;
-  font-size: 13px; color: var(--ink-soft);
+  display: flex; justify-content: center; align-items: center;
+  gap: 16px; margin-top: 20px;
+  font-size: 12px; color: var(--ink-soft);
+  letter-spacing: 0.1em;
 }
-.shelf-pagination span { cursor: pointer; border-bottom: 1px dotted var(--ink-soft); }
-.shelf-pagination .page-info { cursor: default; border: none; }
+.shelf-pagination span { cursor: pointer; }
+.shelf-pagination span:hover { color: var(--accent); }
+.shelf-pagination .page-info { cursor: default; color: var(--ink-soft); }
 .export-btn {
-  display: block; margin: 20px auto 0;
-  background: none; border: 1px solid var(--line);
-  color: var(--ink-soft); border-radius: 4px;
-  padding: 8px 20px; font-family: inherit;
-  font-size: 12px; letter-spacing: 0.15em; cursor: pointer;
+  display: block; margin: 24px auto 0;
+  background: none; border: none;
+  color: var(--line); font-family: inherit;
+  font-size: 11px; letter-spacing: 0.2em;
+  cursor: pointer; text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
 }
+.export-btn:hover { color: var(--ink-soft); }
 
-/* 录入页 */
-textarea#importText {
-  width: 100%; height: 220px; font-family: inherit;
-  font-size: 14px; padding: 12px; border: 1px solid var(--line);
-  border-radius: 4px; background: #fffdf9; resize: vertical;
+/* ── 录入页 ── */
+.import-hint {
+  font-size: 12px; color: var(--ink-soft);
+  letter-spacing: 0.05em; margin-bottom: 12px;
   line-height: 1.8;
 }
-.primary-btn {
-  margin-top: 10px; background: var(--accent); color: #fffdf9;
-  border: none; border-radius: 4px; padding: 10px 20px;
+textarea#importText {
+  width: 100%; height: 200px;
   font-family: inherit; font-size: 14px;
-  letter-spacing: 0.2em; cursor: pointer;
+  padding: 14px; line-height: 2;
+  border: 1px solid var(--line); border-radius: 2px;
+  background: #faf6ee; color: var(--ink);
+  resize: vertical; outline: none;
 }
-.hint { font-size: 12px; color: var(--ink-soft); margin-top: 6px; margin-bottom: 10px; }
-.empty { text-align: center; color: var(--ink-soft); font-size: 13px; padding: 30px 0; }
+textarea#importText:focus { border-color: var(--accent-l); }
+.primary-btn {
+  margin-top: 12px;
+  background: var(--accent); color: #faf6ee;
+  border: none; border-radius: 2px;
+  padding: 10px 24px; font-family: inherit;
+  font-size: 13px; letter-spacing: 0.25em;
+  cursor: pointer; transition: background 0.2s;
+}
+.primary-btn:hover { background: #6a4c2a; }
 
-/* 标签编辑弹出 */
-.tag-edit-panel {
-  margin-top: 8px; display: none;
-}
-.tag-edit-panel.show { display: flex; gap: 8px; }
-.tag-edit-panel input {
-  flex: 1; font-family: inherit; font-size: 13px;
-  padding: 5px 8px; border: 1px solid var(--line);
-  border-radius: 4px; background: #fff;
-}
-.tag-edit-panel button {
-  font-family: inherit; font-size: 12px;
-  border: 1px solid var(--accent); background: none;
-  color: var(--accent); border-radius: 4px;
-  padding: 4px 10px; cursor: pointer;
+.empty {
+  text-align: center; color: var(--ink-soft);
+  font-size: 13px; padding: 40px 0;
+  letter-spacing: 0.1em;
 }
 </style>
 </head>
@@ -227,7 +387,9 @@ textarea#importText {
 
 <header>
   <h1>拾遗</h1>
-  <p>古语 · 旧句 · 私藏</p>
+  <div class="sub">
+    <span>古语</span>·<span>旧句</span>·<span>私藏</span>
+  </div>
 </header>
 
 <main>
@@ -240,12 +402,12 @@ textarea#importText {
   <!-- 藏书 -->
   <div class="view" id="view-shelf">
     <div class="shelf-bar">
-      <input type="text" id="shelfSearch" placeholder="搜词句、意思、标记…">
+      <input type="text" id="shelfSearch" placeholder="搜词句、意思、标记……">
       <select id="shelfMode">
         <option value="keyword">关键词</option>
         <option value="semantic">意思</option>
       </select>
-      <button onclick="doShelfSearch()">找</button>
+      <button onclick="doShelfSearch()">寻</button>
     </div>
     <div id="shelf-list"></div>
     <div class="shelf-pagination" id="shelf-pagination"></div>
@@ -254,8 +416,8 @@ textarea#importText {
 
   <!-- 录入 -->
   <div class="view" id="view-import">
-    <p class="hint">把摘抄的文本整段粘贴进来，系统只做切分整理，不会自动添加解释。</p>
-    <textarea id="importText" placeholder="粘贴一段或多段摘抄…"></textarea>
+    <p class="import-hint">把摘抄的文本整段粘贴进来，系统只做切分整理，不会自动添加解释。</p>
+    <textarea id="importText" placeholder="粘贴一段或多段摘抄……"></textarea>
     <button class="primary-btn" onclick="doImport()">整理入库</button>
     <div id="import-result"></div>
   </div>
@@ -275,6 +437,7 @@ const SHELF_LIMIT = 20;
 let shelfTotal = 0;
 let currentSpeakBtn = null;
 
+// ── 视图切换 ──
 function switchView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
@@ -295,171 +458,181 @@ function escapeHtml(s) {
   return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// ── 卡片渲染 ──────────────────────────────────────
+function parseTags(str) {
+  if (!str || !str.trim()) return [];
+  return str.trim().split(/\s+/).filter(Boolean);
+}
+
+// ── 卡片渲染 ──
 function renderCard(entry, showListen = false) {
   const div = document.createElement('div');
   div.className = 'card ' + entry.type;
   div.dataset.id = entry.id;
 
+  // 正文
   let html = `<div class="content">${escapeHtml(entry.content)}</div>`;
   if (entry.note) html += `<div class="note">${escapeHtml(entry.note)}</div>`;
   if (entry.source) html += `<div class="source">${escapeHtml(entry.source)}</div>`;
 
-  // 标签显示
+  // 标签
   const tagList = parseTags(entry.tags);
   if (tagList.length > 0) {
-    html += `<div class="tags">${tagList.map(t => `<span class="tag" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`).join('')}</div>`;
+    html += `<div class="tags">${tagList.map(t =>
+      `<span class="tag" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`
+    ).join('')}</div>`;
+  }
+
+  // 听按钮（仅邂逅页）
+  if (showListen) {
+    html += `<div class="listen-area"><button class="listen-btn">听</button></div>`;
   }
 
   // 操作栏
   html += `<div class="actions">
-    <span class="ety-toggle" onclick="togglePanel(this,'ety')">溯源</span>
-    <span class="ask-toggle" onclick="togglePanel(this,'ask')">试问</span>
-    <span class="note-toggle" onclick="togglePanel(this,'notes')">笔记</span>
+    <span class="ety-toggle" onclick="toggleCombined(this)">溯源</span>
     <span onclick="toggleTagEdit(this)">标记</span>
-    <span onclick="editEntry(${entry.id}, this)">改</span>
-    <span onclick="deleteEntry(${entry.id}, this)">删</span>
+    <div class="action-right">
+      <span onclick="editEntry(${entry.id}, this)">改</span>
+      <span onclick="deleteEntry(${entry.id}, this)">删</span>
+    </div>
   </div>`;
 
-  // 标签编辑区
+  // 标签编辑
   html += `<div class="tag-edit-panel">
     <input type="text" placeholder="用空格分隔多个标记" value="${escapeHtml(entry.tags || '')}">
     <button onclick="saveTags(${entry.id}, this)">存</button>
   </div>`;
 
-  // 溯源面板
-  html += `<div class="ai-panel etymology-panel"></div>`;
-  // 试问面板
-  html += `<div class="ai-panel ask-panel">
-    <textarea rows="2" placeholder="想问什么？留空则给出一般解读"></textarea>
-    <button class="ask-btn" onclick="doAsk(${entry.id}, this)">问</button>
-    <div class="answer"></div>
-  </div>`;
-  // 笔记面板
-  html += `<div class="notes-panel">
-    <div class="notes-list"></div>
-    <div class="note-input-area">
-      <textarea rows="2" placeholder="记下感想、摘录的例句…"></textarea>
-      <button onclick="addNote(${entry.id}, this)">存</button>
+  // 综合面板：溯源内容 + 试问 + 笔记（连贯）
+  html += `<div class="combined-panel">
+    <div class="ety-content loading">查证中…</div>
+    <div class="panel-actions">
+      <span class="panel-tab active" onclick="switchPanelTab(this,'ask')">试问</span>
+      <span class="panel-tab" onclick="switchPanelTab(this,'notes')">笔记</span>
+    </div>
+    <div class="panel-input-area ask-area">
+      <textarea rows="2" placeholder="想问什么？留空则给出一般解读"></textarea>
+      <button class="panel-submit" onclick="doAsk(${entry.id}, this)">问</button>
+      <div class="ask-answer"></div>
+    </div>
+    <div class="panel-input-area notes-area" style="display:none">
+      <div class="notes-list"></div>
+      <textarea rows="2" placeholder="记下感想、摘录好句……"></textarea>
+      <button class="panel-submit" onclick="addNote(${entry.id}, this)">存</button>
     </div>
   </div>`;
 
   div.innerHTML = html;
 
-  // 听按钮（邂逅页）
+  // 听按钮事件（需要在 innerHTML 之后绑定）
   if (showListen) {
-    const controls = document.createElement('div');
-    controls.className = 'recite-controls';
-    const listenBtn = document.createElement('button');
-    listenBtn.textContent = '听';
-    listenBtn.addEventListener('click', function() {
-      if (currentSpeakBtn && currentSpeakBtn !== listenBtn) {
+    const btn = div.querySelector('.listen-btn');
+    btn.addEventListener('click', function () {
+      if (currentSpeakBtn && currentSpeakBtn !== btn) {
         speechSynthesis.cancel();
         currentSpeakBtn.textContent = '听';
         currentSpeakBtn.classList.remove('speaking');
       }
-      if (listenBtn.classList.contains('speaking')) {
+      if (btn.classList.contains('speaking')) {
         speechSynthesis.cancel();
-        listenBtn.textContent = '听';
-        listenBtn.classList.remove('speaking');
+        btn.textContent = '听';
+        btn.classList.remove('speaking');
         currentSpeakBtn = null;
       } else {
-        speak(entry.content, listenBtn);
+        speak(entry.content, btn);
       }
     });
-    controls.appendChild(listenBtn);
-    div.querySelector('.actions').before(controls);
   }
 
   return div;
 }
 
-function parseTags(tagsStr) {
-  if (!tagsStr || !tagsStr.trim()) return [];
-  return tagsStr.trim().split(/\s+/).filter(Boolean);
-}
-
-// ── 面板开关 ──────────────────────────────────────
-function togglePanel(btn, type) {
+// ── 综合面板开关 ──
+function toggleCombined(btn) {
   const card = btn.closest('.card');
-  const panelClass = type === 'ety' ? 'etymology-panel' : type === 'ask' ? 'ask-panel' : 'notes-panel';
-  const panel = card.querySelector('.' + panelClass);
+  const panel = card.querySelector('.combined-panel');
   const isShow = panel.classList.contains('show');
-
-  // 关闭同卡片其他面板
-  card.querySelectorAll('.ai-panel, .notes-panel').forEach(p => p.classList.remove('show'));
-  card.querySelectorAll('.actions span').forEach(s => s.classList.remove('active-action'));
-
-  if (!isShow) {
-    panel.classList.add('show');
-    btn.classList.add('active-action');
-    if (type === 'ety') loadEtymology(card);
-    if (type === 'notes') loadNotes(card);
+  panel.classList.toggle('show');
+  btn.classList.toggle('active-action', !isShow);
+  if (!isShow && !panel.dataset.etyLoaded) {
+    loadEtymology(card);
   }
 }
 
-// ── 溯源 ──────────────────────────────────────────
+function switchPanelTab(btn, tab) {
+  const panel = btn.closest('.combined-panel');
+  panel.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  panel.querySelector('.ask-area').style.display = tab === 'ask' ? 'block' : 'none';
+  panel.querySelector('.notes-area').style.display = tab === 'notes' ? 'block' : 'none';
+  if (tab === 'notes' && !panel.dataset.notesLoaded) {
+    loadNotes(btn.closest('.card'));
+  }
+}
+
+// ── 溯源 ──
 async function loadEtymology(card) {
-  const panel = card.querySelector('.etymology-panel');
-  if (panel.dataset.loaded) return;
-  panel.textContent = '查证中…';
+  const panel = card.querySelector('.combined-panel');
+  const div = card.querySelector('.ety-content');
+  panel.dataset.etyLoaded = '1';
   const id = parseInt(card.dataset.id);
   const data = await api('/api/etymology', { method: 'POST', body: JSON.stringify({ id }) });
-  panel.textContent = data.content || data.error || '未能查到';
-  panel.dataset.loaded = '1';
+  div.classList.remove('loading');
+  div.textContent = data.content || data.error || '未能查到';
 }
 
-// ── 试问 ──────────────────────────────────────────
+// ── 试问 ──
 async function doAsk(id, btn) {
-  const panel = btn.closest('.ask-panel');
-  const question = panel.querySelector('textarea').value;
-  const answerDiv = panel.querySelector('.answer');
-  answerDiv.textContent = '寻思中…';
-  const data = await api('/api/ask', { method: 'POST', body: JSON.stringify({ id, question }) });
+  const panel = btn.closest('.combined-panel');
+  const textarea = panel.querySelector('.ask-area textarea');
+  const answerDiv = panel.querySelector('.ask-answer');
+  answerDiv.textContent = '寻思中……';
+  const data = await api('/api/ask', {
+    method: 'POST',
+    body: JSON.stringify({ id, question: textarea.value })
+  });
   const answer = data.content || data.error || '暂无回应';
   answerDiv.textContent = answer;
-
-  // 查全诗按钮——取答案里出现的第一个书名号内容作搜索词
-  const titleMatch = answer.match(/《([^》]+)》/);
-  if (titleMatch) {
-    const searchWord = titleMatch[1];
-    const link = document.createElement('a');
-    link.href = `https://www.gushiwen.cn/search.aspx?value=${encodeURIComponent(searchWord)}`;
-    link.target = '_blank';
-    link.style.cssText = 'display:block;margin-top:8px;font-size:12px;color:var(--accent);';
-    link.textContent = `查全诗：《${searchWord}》→`;
-    answerDiv.appendChild(link);
+  // 查全诗链接
+  const m = answer.match(/《([^》]+)》/);
+  if (m) {
+    const a = document.createElement('a');
+    a.href = `https://www.gushiwen.cn/search.aspx?value=${encodeURIComponent(m[1])}`;
+    a.target = '_blank';
+    a.textContent = `查全诗：《${m[1]}》→`;
+    answerDiv.appendChild(a);
   }
 }
 
-// ── 笔记 ──────────────────────────────────────────
+// ── 笔记 ──
 async function loadNotes(card) {
-  const panel = card.querySelector('.notes-panel');
-  const list = panel.querySelector('.notes-list');
-  if (panel.dataset.loaded) return;
+  const panel = card.querySelector('.combined-panel');
+  panel.dataset.notesLoaded = '1';
   const id = parseInt(card.dataset.id);
   const data = await api(`/api/entry/${id}/notes`);
+  const list = card.querySelector('.notes-list');
   list.innerHTML = '';
   (data.notes || []).forEach(n => renderNoteItem(list, n));
-  panel.dataset.loaded = '1';
 }
 
 function renderNoteItem(list, note) {
   const div = document.createElement('div');
   div.className = 'note-item';
-  div.dataset.noteId = note.id;
-  div.innerHTML = `<span>${escapeHtml(note.content)}</span><span class="note-del" onclick="deleteNote(${note.id}, this)">删</span>`;
+  div.innerHTML = `<span>${escapeHtml(note.content)}</span>
+    <span class="note-del" onclick="deleteNote(${note.id}, this)">删</span>`;
   list.appendChild(div);
 }
 
 async function addNote(entryId, btn) {
-  const panel = btn.closest('.notes-panel');
-  const textarea = panel.querySelector('textarea');
+  const area = btn.closest('.notes-area');
+  const textarea = area.querySelector('textarea');
   const content = textarea.value.trim();
   if (!content) return;
-  const data = await api(`/api/entry/${entryId}/notes`, { method: 'POST', body: JSON.stringify({ content }) });
+  const data = await api(`/api/entry/${entryId}/notes`, {
+    method: 'POST', body: JSON.stringify({ content })
+  });
   if (data.id) {
-    renderNoteItem(panel.querySelector('.notes-list'), data);
+    renderNoteItem(area.querySelector('.notes-list'), data);
     textarea.value = '';
   }
 }
@@ -470,11 +643,9 @@ async function deleteNote(noteId, btn) {
   btn.closest('.note-item').remove();
 }
 
-// ── 标签 ──────────────────────────────────────────
+// ── 标签 ──
 function toggleTagEdit(btn) {
-  const card = btn.closest('.card');
-  const panel = card.querySelector('.tag-edit-panel');
-  panel.classList.toggle('show');
+  btn.closest('.card').querySelector('.tag-edit-panel').classList.toggle('show');
 }
 
 async function saveTags(id, btn) {
@@ -483,19 +654,21 @@ async function saveTags(id, btn) {
   await api(`/api/entry/${id}`, { method: 'PUT', body: JSON.stringify({ tags }) });
   const card = btn.closest('.card');
   card.querySelector('.tag-edit-panel').classList.remove('show');
-  // 更新标签显示
   let tagDiv = card.querySelector('.tags');
   const tagList = parseTags(tags);
   if (tagList.length > 0) {
     if (!tagDiv) {
       tagDiv = document.createElement('div');
       tagDiv.className = 'tags';
-      card.querySelector('.source, .note, .content').after(tagDiv);
+      const src = card.querySelector('.source');
+      const note = card.querySelector('.note');
+      const after = src || note || card.querySelector('.content');
+      after.insertAdjacentElement('afterend', tagDiv);
     }
-    tagDiv.innerHTML = tagList.map(t => `<span class="tag" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`).join('');
-  } else if (tagDiv) {
-    tagDiv.remove();
-  }
+    tagDiv.innerHTML = tagList.map(t =>
+      `<span class="tag" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`
+    ).join('');
+  } else if (tagDiv) tagDiv.remove();
 }
 
 function filterByTag(tag) {
@@ -505,7 +678,7 @@ function filterByTag(tag) {
   loadShelf({ q: tag, mode: 'keyword' });
 }
 
-// ── 编辑/删除 ─────────────────────────────────────
+// ── 编辑/删除 ──
 async function editEntry(id, btn) {
   const card = btn.closest('.card');
   const contentDiv = card.querySelector('.content');
@@ -521,24 +694,10 @@ async function deleteEntry(id, btn) {
   btn.closest('.card').remove();
 }
 
-// ── 邂逅（随机+听）────────────────────────────────
-async function loadRandom() {
-  const list = document.getElementById('home-list');
-  list.innerHTML = '<div class="empty">翻阅中…</div>';
-  const data = await api('/api/random?n=8');
-  list.innerHTML = '';
-  if (!data.entries || data.entries.length === 0) {
-    list.innerHTML = '<div class="empty">库里还空着，去"录入"添加一些吧</div>';
-    return;
-  }
-  data.entries.forEach(e => list.appendChild(renderCard(e, true)));
-}
-
-// ── 语音 ──────────────────────────────────────────
+// ── 语音 ──
 function pickBestVoice() {
   const voices = speechSynthesis.getVoices();
-  // 优先选优化音质中文语音
-  const preferred = ['li mu', 'lì mù', '李牧', 'siri', 'enhanced'];
+  const preferred = ['li mu', 'lì mù', '李牧', 'enhanced', 'siri'];
   for (const p of preferred) {
     const v = voices.find(v => v.name.toLowerCase().includes(p) && v.lang.startsWith('zh'));
     if (v) return v;
@@ -563,10 +722,23 @@ function speak(text, btn) {
   speechSynthesis.speak(utter);
 }
 
-// ── 藏书 ──────────────────────────────────────────
+// ── 邂逅 ──
+async function loadRandom() {
+  const list = document.getElementById('home-list');
+  list.innerHTML = '<div class="empty">翻阅中……</div>';
+  const data = await api('/api/random?n=8');
+  list.innerHTML = '';
+  if (!data.entries || data.entries.length === 0) {
+    list.innerHTML = '<div class="empty">库里还空着，去「录入」添加一些吧</div>';
+    return;
+  }
+  data.entries.forEach(e => list.appendChild(renderCard(e, true)));
+}
+
+// ── 藏书 ──
 async function loadShelf(opts = {}) {
   const list = document.getElementById('shelf-list');
-  list.innerHTML = '<div class="empty">翻阅中…</div>';
+  list.innerHTML = '<div class="empty">翻阅中……</div>';
   const q = opts.q !== undefined ? opts.q : document.getElementById('shelfSearch').value.trim();
   const mode = opts.mode || document.getElementById('shelfMode').value;
 
@@ -585,11 +757,9 @@ async function loadShelf(opts = {}) {
 
   list.innerHTML = '';
   shelfTotal = data.total || 0;
-
   if (!data.entries || data.entries.length === 0) {
     list.innerHTML = '<div class="empty">没有找到相符的</div>';
-    renderPagination(q);
-    return;
+    renderPagination(q); return;
   }
   data.entries.forEach(e => list.appendChild(renderCard(e, false)));
   renderPagination(q);
@@ -619,10 +789,7 @@ function renderPagination(q) {
   }
 }
 
-async function doShelfSearch() {
-  shelfOffset = 0;
-  loadShelf();
-}
+async function doShelfSearch() { shelfOffset = 0; loadShelf(); }
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('shelfSearch').addEventListener('keydown', e => {
@@ -630,7 +797,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ── 导出 ──────────────────────────────────────────
+// ── 导出 ──
 async function doExport() {
   const data = await api('/api/export');
   if (!data.entries || data.entries.length === 0) { alert('词库为空'); return; }
@@ -638,28 +805,28 @@ async function doExport() {
     let s = e.content;
     if (e.source) s += `\n——${e.source}`;
     if (e.note) s += `\n［${e.note}］`;
-    if (e.tags) s += `\n#${e.tags.trim().split(/\s+/).join(' #')}`;
+    if (e.tags) s += `\n#${parseTags(e.tags).join(' #')}`;
     return s;
   });
-  const blob = new Blob([lines.join('\n\n---\n\n')], { type: 'text/plain;charset=utf-8' });
+  const blob = new Blob([lines.join('\n\n───\n\n')], { type: 'text/plain;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `拾遗_${new Date().toLocaleDateString('zh-CN')}.txt`;
   a.click();
 }
 
-// ── 录入 ──────────────────────────────────────────
+// ── 录入 ──
 async function doImport() {
   const text = document.getElementById('importText').value;
   if (!text.trim()) return;
   const resultDiv = document.getElementById('import-result');
-  resultDiv.innerHTML = '<div class="empty">整理中，请稍候…</div>';
+  resultDiv.innerHTML = '<div class="empty">整理中，请稍候……</div>';
   const data = await api('/api/import', { method: 'POST', body: JSON.stringify({ text }) });
   if (data.error) {
     resultDiv.innerHTML = `<div class="empty">出错了：${escapeHtml(data.error)}</div>`;
     return;
   }
-  resultDiv.innerHTML = `<p class="hint" style="margin-top:12px;">已收入 ${data.count} 条：</p>`;
+  resultDiv.innerHTML = `<p style="font-size:12px;color:var(--ink-soft);margin:12px 0 8px;letter-spacing:0.1em;">已收入 ${data.count} 条</p>`;
   data.inserted.forEach(e => resultDiv.appendChild(renderCard(e, false)));
   document.getElementById('importText').value = '';
 }
