@@ -337,15 +337,13 @@ function renderCard(entry, extraClass = '') {
   if (entry.source) html += `<div class="source">${escapeHtml(entry.source)}</div>`;
 
   html += `<div class="actions">`;
-  if (entry.type === 'word') {
-    html += `<span onclick="loadEtymology(${entry.id}, this)">溯源</span>`;
-  } else {
-    html += `<span onclick="toggleAsk(${entry.id}, this)">试问</span>`;
-  }
+  html += `<span onclick="loadEtymology(${entry.id}, this)">溯源</span>`;
+  html += `<span onclick="toggleAsk(${entry.id}, this)">试问</span>`;
   html += `<span onclick="editEntry(${entry.id}, this)">改</span>`;
   html += `<span onclick="deleteEntry(${entry.id}, this)">删</span>`;
   html += `</div>`;
-  html += `<div class="ai-panel"></div>`;
+  html += `<div class="ai-panel etymology-panel"></div>`;
+  html += `<div class="ai-panel ask-panel"></div>`;
 
   div.innerHTML = html;
   return div;
@@ -371,9 +369,14 @@ async function loadRandom() {
 // ---------- 溯源 ----------
 async function loadEtymology(id, btn) {
   const card = btn.closest('.card');
-  const panel = card.querySelector('.ai-panel');
+  const panel = card.querySelector('.etymology-panel');
   if (panel.classList.contains('show')) {
     panel.classList.remove('show');
+    return;
+  }
+  // 如果已经有内容就直接展开，不重复请求
+  if (panel.dataset.loaded) {
+    panel.classList.add('show');
     return;
   }
   panel.classList.add('show');
@@ -383,26 +386,30 @@ async function loadEtymology(id, btn) {
     body: JSON.stringify({ id })
   });
   panel.textContent = data.content || data.error || '未能查到';
+  panel.dataset.loaded = '1';
 }
 
 // ---------- 试问 ----------
 function toggleAsk(id, btn) {
   const card = btn.closest('.card');
-  const panel = card.querySelector('.ai-panel');
+  const panel = card.querySelector('.ask-panel');
   if (panel.classList.contains('show')) {
     panel.classList.remove('show');
     return;
   }
   panel.classList.add('show');
-  panel.innerHTML = `
-    <textarea rows="2" placeholder="想问什么？留空则给出一般解读"></textarea>
-    <button onclick="doAsk(${id}, this)">问</button>
-    <div class="answer" style="margin-top:8px;"></div>
-  `;
+  if (!panel.dataset.loaded) {
+    panel.innerHTML = `
+      <textarea rows="2" placeholder="想问什么？留空则给出一般解读"></textarea>
+      <button onclick="doAsk(${id}, this)">问</button>
+      <div class="answer" style="margin-top:8px;"></div>
+    `;
+    panel.dataset.loaded = '1';
+  }
 }
 
 async function doAsk(id, btn) {
-  const panel = btn.closest('.ai-panel');
+  const panel = btn.closest('.ask-panel');
   const question = panel.querySelector('textarea').value;
   const answerDiv = panel.querySelector('.answer');
   answerDiv.textContent = '想着…';
@@ -516,10 +523,17 @@ async function loadRecitation() {
       <div class="content hidden-text">${escapeHtml(e.content)}</div>
       ${e.source ? `<div class="source">${escapeHtml(e.source)}</div>` : ''}
       <div class="recite-controls">
-        <button onclick="speak(${JSON.stringify(e.content)})">听</button>
-        <button onclick="this.closest('.card').querySelector('.content').classList.toggle('hidden-text')">显 / 隐</button>
+        <button class="speak-btn">听</button>
+        <button class="toggle-btn">显 / 隐</button>
       </div>
     `;
+    // iOS Safari 要求在真实 click 事件里直接调用 speak，不能用 onclick 字符串
+    card.querySelector('.speak-btn').addEventListener('click', function() {
+      speak(e.content);
+    });
+    card.querySelector('.toggle-btn').addEventListener('click', function() {
+      card.querySelector('.content').classList.toggle('hidden-text');
+    });
     list.appendChild(card);
   });
 }
