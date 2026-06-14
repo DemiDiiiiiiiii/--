@@ -295,7 +295,7 @@
 </nav>
 
 <script>
-let API_BASE = localStorage.getItem('shici_api_base') || '';
+let API_BASE = 'https://shici-vault.demi89612.workers.dev';
 
 function showSettings() {
   const url = prompt('请输入 Worker 的 API 地址（例如 https://shici-vault.xxx.workers.dev）', API_BASE);
@@ -305,8 +305,8 @@ function showSettings() {
   }
 }
 
-if (!API_BASE) {
-  setTimeout(showSettings, 300);
+if (false) {
+  
 }
 
 function switchView(name) {
