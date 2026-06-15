@@ -119,9 +119,8 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   color: var(--ink);
 }
 .card.word .content {
-  font-size: 23px;
-  letter-spacing: 0.1em;
-  font-weight: 300;
+  font-size: 18px;
+  letter-spacing: 0.05em;
 }
 .card .note {
   margin-top: 10px; font-size: 13px;
@@ -446,6 +445,7 @@ textarea#importText:focus { border-color: var(--accent-l); }
 
 <!-- 寻句悬浮按钮 -->
 <button class="seek-fab" onclick="openSeek()" title="寻句">寻</button>
+<button onclick="showCodeModal()" style="position:fixed;bottom:88px;left:20px;width:44px;height:44px;border-radius:50%;background:transparent;border:1px solid var(--line);color:var(--ink-soft);font-family:inherit;font-size:11px;letter-spacing:0.05em;cursor:pointer;z-index:200;">码</button>
 
 <!-- 寻句弹层 -->
 <div class="seek-overlay" id="seekOverlay" onclick="closeSeekIfBg(event)">
@@ -463,6 +463,28 @@ textarea#importText:focus { border-color: var(--accent-l); }
 
 <script>
 const API_BASE = 'https://shici-vault.demi89612.workers.dev';
+
+// 同步码：存在localStorage，每次请求带上
+function getCode() {
+  let code = localStorage.getItem('shici_user_code');
+  if (!code) {
+    // 首次使用，生成随机码
+    code = Math.random().toString(36).slice(2, 8) + Math.random().toString(36).slice(2, 8);
+    localStorage.setItem('shici_user_code', code);
+  }
+  return code;
+}
+
+function showCodeModal() {
+  const code = getCode();
+  const msg = `你的同步码：\n\n${code}\n\n把这个码分享给朋友，他们输入后可以看到同一个词库。\n或者输入别人的码，切换到他们的词库。`;
+  const newCode = prompt(msg + '\n\n（留空确认继续用当前码，输入新码则切换）');
+  if (newCode && newCode.trim() && newCode.trim() !== code) {
+    localStorage.setItem('shici_user_code', newCode.trim());
+    location.reload();
+  }
+}
+
 let shelfOffset = 0;
 const SHELF_LIMIT = 20;
 let shelfTotal = 0;
@@ -478,7 +500,22 @@ function switchView(name) {
 }
 
 async function api(path, opts = {}) {
-  const res = await fetch(API_BASE + path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  const code = getCode();
+  // GET请求：code加到URL参数
+  let fullPath = path;
+  if (!opts.method || opts.method === 'GET') {
+    const sep = path.includes('?') ? '&' : '?';
+    fullPath = path + sep + 'code=' + encodeURIComponent(code);
+  }
+  // POST/PUT请求：code加到body
+  if (opts.body && (opts.method === 'POST' || opts.method === 'PUT')) {
+    try {
+      const body = JSON.parse(opts.body);
+      body.code = code;
+      opts = { ...opts, body: JSON.stringify(body) };
+    } catch(e) {}
+  }
+  const res = await fetch(API_BASE + fullPath, { headers: { 'Content-Type': 'application/json' }, ...opts });
   return res.json();
 }
 
@@ -693,18 +730,23 @@ async function deleteEntry(id, btn) {
 
 function pickBestVoice() {
   const voices = speechSynthesis.getVoices();
-  const keywords = ['li mu', 'lì mù', '李牧', 'enhanced', 'siri'];
-  for (const k of keywords) {
-    const v = voices.find(v => v.name.toLowerCase().includes(k) && v.lang.startsWith('zh'));
+  // 优先粤语优化音质
+  const cantoneseKeywords = ['善宜', 'sin-ji', 'sinji', 'mei-jia', 'meijia', 'enhanced'];
+  for (const k of cantoneseKeywords) {
+    const v = voices.find(v => v.name.toLowerCase().includes(k) && (v.lang === 'zh-HK' || v.lang === 'yue'));
     if (v) return v;
   }
+  // 退而求其次：任何粤语
+  const cantonese = voices.find(v => v.lang === 'zh-HK' || v.lang === 'yue-HK');
+  if (cantonese) return cantonese;
+  // 再退：任何中文
   return voices.find(v => v.lang.startsWith('zh')) || voices[0];
 }
 
 function speak(text, btn) {
   speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'zh-CN'; utter.rate = 0.72;
+  utter.lang = 'zh-HK'; utter.rate = 0.72;
   const voice = pickBestVoice();
   if (voice) utter.voice = voice;
   utter.onstart = () => { if (btn) { btn.textContent = '停'; btn.classList.add('speaking'); currentSpeakBtn = btn; } };
