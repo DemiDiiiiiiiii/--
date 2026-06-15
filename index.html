@@ -21,12 +21,10 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* 宣纸纹理：噪点 + 微渐变 */
 body {
   font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
   background-color: var(--paper);
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
   background-size: 300px 300px;
   color: var(--ink);
   line-height: 2;
@@ -36,50 +34,98 @@ body {
 
 /* ── 页头 ── */
 header {
-  padding: 40px 24px 22px;
+  padding: 36px 20px 18px;
   text-align: center;
   border-bottom: 1px solid var(--line);
-  background: transparent;
   position: relative;
 }
-header::after {
-  content: '';
-  position: absolute;
-  bottom: -3px; left: 50%;
-  transform: translateX(-50%);
-  width: 40px; height: 1px;
-  background: var(--ink-soft);
-}
 header h1 {
-  font-size: 36px;
-  font-weight: 300;
-  letter-spacing: 0.7em;
-  text-indent: 0.7em;
-  color: var(--ink);
-  margin-bottom: 6px;
+  font-size: 34px; font-weight: 300;
+  letter-spacing: 0.7em; text-indent: 0.7em;
+  color: var(--ink); margin-bottom: 4px;
 }
 header .sub {
-  font-size: 11.5px;
-  color: var(--ink-soft);
-  letter-spacing: 0.5em;
-  text-indent: 0.5em;
+  font-size: 11px; color: var(--ink-soft);
+  letter-spacing: 0.5em; text-indent: 0.5em;
 }
+.settings-btn {
+  position: absolute; top: 20px; right: 16px;
+  background: none; border: none;
+  font-size: 18px; color: var(--ink-soft);
+  cursor: pointer; padding: 4px;
+  line-height: 1;
+}
+.settings-btn:hover { color: var(--accent); }
 
-/* ── 底部导航 ── */
+/* ── 设置弹层 ── */
+.settings-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(26,25,23,0.35); z-index: 400;
+  align-items: flex-start; justify-content: flex-end;
+}
+.settings-overlay.show { display: flex; }
+.settings-modal {
+  background: var(--paper-card);
+  width: 280px; min-height: 100vh;
+  padding: 32px 24px; position: relative;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+}
+.settings-modal h3 {
+  font-size: 14px; font-weight: 400;
+  letter-spacing: 0.3em; color: var(--ink);
+  margin-bottom: 24px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--line);
+}
+.settings-close {
+  position: absolute; top: 16px; right: 16px;
+  background: none; border: none;
+  font-size: 18px; color: var(--ink-soft); cursor: pointer;
+}
+.settings-section { margin-bottom: 28px; }
+.settings-label {
+  font-size: 11px; color: var(--ink-soft);
+  letter-spacing: 0.2em; margin-bottom: 8px;
+}
+.settings-code {
+  font-size: 15px; color: var(--ink);
+  letter-spacing: 0.1em; padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 10px; word-break: break-all;
+}
+.settings-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.settings-action {
+  font-family: inherit; font-size: 12px;
+  border: 1px solid var(--accent-l); background: none;
+  color: var(--accent); border-radius: 2px;
+  padding: 5px 14px; cursor: pointer;
+  letter-spacing: 0.1em;
+}
+.settings-action:hover { background: var(--accent); color: #f8f7f4; }
+.settings-action.danger {
+  border-color: var(--line); color: var(--ink-soft);
+}
+.settings-input {
+  width: 100%; font-family: inherit; font-size: 13px;
+  border: none; border-bottom: 1px solid var(--line);
+  padding: 6px 0; background: transparent; color: var(--ink);
+  outline: none; margin-bottom: 8px;
+}
+.settings-input:focus { border-color: var(--accent-l); }
+.settings-hint { font-size: 11px; color: var(--ink-soft); line-height: 1.7; }
+
+/* ── 导航 ── */
 nav {
   position: fixed; bottom: 0; left: 0; right: 0;
   display: flex;
   background: rgba(242,240,236,0.96);
   backdrop-filter: blur(8px);
-  border-top: 1px solid var(--line);
-  z-index: 100;
+  border-top: 1px solid var(--line); z-index: 100;
 }
 nav button {
   flex: 1; background: none; border: none;
-  padding: 13px 0 11px;
-  font-family: inherit; font-size: 13px;
-  color: var(--ink-soft); letter-spacing: 0.25em;
-  cursor: pointer;
+  padding: 13px 0 11px; font-family: inherit;
+  font-size: 13px; color: var(--ink-soft);
+  letter-spacing: 0.25em; cursor: pointer;
 }
 nav button.active {
   color: var(--accent);
@@ -95,51 +141,36 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
 /* ── 卡片 ── */
 .card {
   background: var(--paper-card);
-  border: 1px solid var(--line);
-  border-radius: 1px;
-  padding: 22px 22px 14px;
-  margin-bottom: 16px;
+  border: 1px solid var(--line); border-radius: 1px;
+  padding: 22px 22px 14px; margin-bottom: 16px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   position: relative;
 }
 .card::after {
-  content: '';
-  position: absolute;
+  content: ''; position: absolute;
   left: 0; top: 20px; bottom: 20px;
-  width: 2px;
-  background: var(--line);
+  width: 2px; background: var(--line);
 }
 .card.word::after { background: var(--accent-dim); }
-
 .card .content {
-  font-size: 18px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  line-height: 2.1;
-  color: var(--ink);
+  font-size: 18px; white-space: pre-wrap;
+  word-break: break-word; line-height: 2.1; color: var(--ink);
 }
-.card.word .content {
-  font-size: 18px;
-  letter-spacing: 0.05em;
-}
+.card.word .content { font-size: 18px; letter-spacing: 0.05em; }
 .card .note {
-  margin-top: 10px; font-size: 13px;
-  color: var(--ink-soft); white-space: pre-wrap;
-  line-height: 1.85; padding-left: 12px;
-  border-left: 1px solid var(--line);
+  margin-top: 10px; font-size: 13px; color: var(--ink-soft);
+  white-space: pre-wrap; line-height: 1.85;
+  padding-left: 12px; border-left: 1px solid var(--line);
 }
 .card .source {
   margin-top: 8px; font-size: 12px;
-  color: var(--accent); text-align: right;
-  letter-spacing: 0.06em;
+  color: var(--accent); text-align: right; letter-spacing: 0.06em;
 }
 .card .tags { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
 .card .tag {
   font-size: 11px; color: var(--accent);
   border: 1px solid var(--accent-dim);
-  border-radius: 20px; padding: 1px 10px;
-  cursor: pointer; letter-spacing: 0.05em;
-  background: transparent;
+  border-radius: 20px; padding: 1px 10px; cursor: pointer;
 }
 
 /* ── 操作栏 ── */
@@ -150,12 +181,10 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
 }
 .card .actions span {
   font-size: 12px; color: var(--ink-soft);
-  letter-spacing: 0.12em; cursor: pointer;
-  padding-right: 14px;
+  letter-spacing: 0.12em; cursor: pointer; padding-right: 14px;
 }
 .card .actions span:hover { color: var(--accent); }
 .card .actions span.active-action { color: var(--accent); }
-.card .actions .sep { color: var(--line); padding: 0; margin-right: 14px; }
 .card .actions .right { margin-left: auto; display: flex; gap: 14px; }
 .card .actions .right span { padding-right: 0; font-size: 11px; }
 
@@ -165,8 +194,7 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   font-family: inherit; font-size: 11px;
   border: 1px solid var(--line); background: none;
   color: var(--ink-soft); border-radius: 20px;
-  padding: 2px 14px; cursor: pointer;
-  letter-spacing: 0.15em;
+  padding: 2px 14px; cursor: pointer; letter-spacing: 0.15em;
 }
 .listen-btn.speaking { border-color: var(--accent); color: var(--accent); }
 
@@ -178,7 +206,6 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   border: none; border-bottom: 1px solid var(--line);
   padding: 3px 0; background: transparent; color: var(--ink); outline: none;
 }
-.tag-edit-panel input:focus { border-color: var(--accent-l); }
 .tag-edit-panel button {
   font-family: inherit; font-size: 12px;
   border: 1px solid var(--accent-l); background: none;
@@ -191,36 +218,33 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   border-top: 1px solid var(--line); padding-top: 14px;
 }
 .combined-panel.show { display: block; }
-
 .ety-content {
   font-size: 13.5px; color: var(--ink-mid);
   line-height: 1.95; white-space: pre-wrap;
 }
 .ety-content.loading { color: var(--ink-soft); font-style: italic; font-size: 13px; }
-
+.ety-footer {
+  text-align: right; margin-top: 6px;
+}
+.regen-btn {
+  font-size: 11px; color: var(--ink-soft); cursor: pointer;
+  letter-spacing: 0.1em; border-bottom: 1px dotted var(--ink-soft);
+}
 .panel-divider {
-  margin: 14px 0 10px;
-  display: flex; align-items: center; gap: 10px;
+  margin: 14px 0 10px; display: flex;
+  align-items: center; gap: 10px;
 }
 .panel-divider::before, .panel-divider::after {
-  content: ''; flex: 1; height: 1px;
-  background: var(--line);
-}
-.panel-divider span {
-  display: flex; gap: 14px;
+  content: ''; flex: 1; height: 1px; background: var(--line);
 }
 .panel-tab {
-  font-size: 11.5px; color: var(--ink-soft);
-  cursor: pointer; letter-spacing: 0.15em;
-  padding-bottom: 1px;
+  font-size: 11.5px; color: var(--ink-soft); cursor: pointer;
+  letter-spacing: 0.15em; padding-bottom: 1px;
   border-bottom: 1px solid transparent;
 }
 .panel-tab.active { color: var(--accent); border-color: var(--accent); }
-
-.panel-body { }
 .panel-section { display: none; }
 .panel-section.active { display: block; }
-
 .panel-textarea {
   width: 100%; font-family: inherit; font-size: 13px;
   border: none; border-bottom: 1px solid var(--line);
@@ -235,25 +259,20 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   color: var(--accent); border-radius: 2px;
   padding: 4px 16px; cursor: pointer; letter-spacing: 0.15em;
 }
-.panel-submit:active { background: var(--accent); color: #fff; }
-
 .ask-answer {
-  margin-top: 10px; font-size: 13.5px;
-  color: var(--ink-mid); line-height: 1.95;
-  white-space: pre-wrap; padding-left: 10px;
-  border-left: 2px solid var(--accent-dim);
+  margin-top: 10px; font-size: 13.5px; color: var(--ink-mid);
+  line-height: 1.95; white-space: pre-wrap;
+  padding-left: 10px; border-left: 2px solid var(--accent-dim);
 }
 .ask-answer a {
   display: inline-block; margin-top: 6px;
-  font-size: 12px; color: var(--accent);
-  text-decoration: none; letter-spacing: 0.05em;
+  font-size: 12px; color: var(--accent); text-decoration: none;
 }
-
 .notes-list { margin-bottom: 8px; }
 .note-item {
   display: flex; justify-content: space-between;
-  align-items: flex-start; gap: 10px;
-  padding: 6px 0; border-bottom: 1px solid var(--line);
+  align-items: flex-start; gap: 10px; padding: 6px 0;
+  border-bottom: 1px solid var(--line);
   font-size: 13px; color: var(--ink-mid); line-height: 1.8;
 }
 .note-item:last-child { border-bottom: none; }
@@ -283,7 +302,7 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
 .shelf-bar select {
   font-family: inherit; font-size: 12px;
   border: 1px solid var(--line); border-radius: 2px;
-  background: transparent; color: var(--ink-soft); padding: 4px 6px; cursor: pointer;
+  background: transparent; color: var(--ink-soft); padding: 4px 6px;
 }
 .shelf-bar button {
   font-family: inherit; font-size: 12px;
@@ -299,21 +318,14 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
 .shelf-pagination span { cursor: pointer; }
 .shelf-pagination span:hover { color: var(--accent); }
 .shelf-pagination .page-info { cursor: default; }
-.export-btn {
-  display: block; margin: 24px auto 0;
-  background: none; border: none; color: var(--line);
-  font-family: inherit; font-size: 11px; letter-spacing: 0.2em;
-  cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
-}
-.export-btn:hover { color: var(--ink-soft); }
 
 /* ── 录入 ── */
-.import-hint { font-size: 12px; color: var(--ink-soft); margin-bottom: 12px; line-height: 1.8; letter-spacing: 0.04em; }
+.import-hint { font-size: 12px; color: var(--ink-soft); margin-bottom: 12px; line-height: 1.8; }
 textarea#importText {
   width: 100%; height: 200px; font-family: inherit; font-size: 14px;
   padding: 14px; line-height: 2; border: 1px solid var(--line);
-  border-radius: 1px; background: var(--paper-card);
-  color: var(--ink); resize: vertical; outline: none;
+  border-radius: 1px; background: var(--paper-card); color: var(--ink);
+  resize: vertical; outline: none;
 }
 textarea#importText:focus { border-color: var(--accent-l); }
 .primary-btn {
@@ -322,7 +334,7 @@ textarea#importText:focus { border-color: var(--accent-l); }
   font-family: inherit; font-size: 13px; letter-spacing: 0.25em; cursor: pointer;
 }
 
-/* ── 寻句 悬浮按钮 ── */
+/* ── 寻句悬浮 ── */
 .seek-fab {
   position: fixed; bottom: 88px; right: 20px;
   width: 44px; height: 44px; border-radius: 50%;
@@ -330,44 +342,28 @@ textarea#importText:focus { border-color: var(--accent-l); }
   border: none; font-family: inherit; font-size: 13px;
   letter-spacing: 0.05em; cursor: pointer;
   box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-  display: flex; align-items: center; justify-content: center;
   z-index: 200;
 }
-
-/* 寻句弹层 */
 .seek-overlay {
-  display: none; position: fixed;
-  inset: 0; background: rgba(26,25,23,0.35);
-  z-index: 300; align-items: flex-end; justify-content: center;
+  display: none; position: fixed; inset: 0;
+  background: rgba(26,25,23,0.35); z-index: 300;
+  align-items: flex-end; justify-content: center;
 }
 .seek-overlay.show { display: flex; }
 .seek-modal {
-  background: var(--paper-card);
-  border-radius: 6px 6px 0 0;
-  padding: 24px 20px 36px;
-  width: 100%; max-width: 600px;
+  background: var(--paper-card); border-radius: 6px 6px 0 0;
+  padding: 24px 20px 36px; width: 100%; max-width: 600px;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
 }
-.seek-modal h3 {
-  font-size: 15px; font-weight: 400;
-  letter-spacing: 0.3em; color: var(--ink);
-  margin-bottom: 6px;
-}
-.seek-modal .seek-hint {
-  font-size: 12px; color: var(--ink-soft);
-  margin-bottom: 14px; letter-spacing: 0.04em;
-}
+.seek-modal h3 { font-size: 15px; font-weight: 400; letter-spacing: 0.3em; margin-bottom: 6px; }
+.seek-hint { font-size: 12px; color: var(--ink-soft); margin-bottom: 14px; }
 .seek-modal textarea {
   width: 100%; font-family: inherit; font-size: 14px;
   border: none; border-bottom: 1px solid var(--line);
   padding: 6px 0; background: transparent; color: var(--ink);
   resize: none; line-height: 1.85; outline: none;
 }
-.seek-modal textarea:focus { border-color: var(--accent-l); }
-.seek-modal textarea::placeholder { color: var(--ink-soft); font-size: 13px; }
-.seek-modal-actions {
-  margin-top: 12px; display: flex; gap: 10px; align-items: center;
-}
+.seek-modal-actions { margin-top: 12px; display: flex; gap: 10px; align-items: center; }
 .seek-submit {
   font-family: inherit; font-size: 13px;
   border: 1px solid var(--accent-l); background: none;
@@ -376,9 +372,8 @@ textarea#importText:focus { border-color: var(--accent-l); }
 }
 .seek-close {
   font-family: inherit; font-size: 12px;
-  border: none; background: none;
-  color: var(--ink-soft); cursor: pointer;
-  letter-spacing: 0.1em; margin-left: auto;
+  border: none; background: none; color: var(--ink-soft);
+  cursor: pointer; letter-spacing: 0.1em; margin-left: auto;
 }
 .seek-results { margin-top: 16px; }
 .seek-result-item {
@@ -386,17 +381,13 @@ textarea#importText:focus { border-color: var(--accent-l); }
   display: flex; align-items: flex-start; gap: 12px;
 }
 .seek-result-item:last-child { border-bottom: none; }
-.seek-result-text {
-  flex: 1; font-size: 14px; color: var(--ink);
-  line-height: 1.9; white-space: pre-wrap;
-}
+.seek-result-text { flex: 1; font-size: 14px; color: var(--ink); line-height: 1.9; }
 .seek-result-source { font-size: 11px; color: var(--accent); margin-top: 3px; }
 .seek-adopt {
   font-family: inherit; font-size: 11px;
   border: 1px solid var(--accent-dim); background: none;
   color: var(--accent); border-radius: 2px;
-  padding: 3px 10px; cursor: pointer; flex-shrink: 0;
-  letter-spacing: 0.05em; margin-top: 2px;
+  padding: 3px 10px; cursor: pointer; flex-shrink: 0; margin-top: 2px;
 }
 
 .empty { text-align: center; color: var(--ink-soft); font-size: 13px; padding: 40px 0; letter-spacing: 0.1em; }
@@ -407,6 +398,7 @@ textarea#importText:focus { border-color: var(--accent-l); }
 <header>
   <h1>拾遗</h1>
   <div class="sub">古语 · 旧句 · 私藏</div>
+  <button class="settings-btn" onclick="openSettings()" title="设置">⚙</button>
 </header>
 
 <main>
@@ -426,7 +418,6 @@ textarea#importText:focus { border-color: var(--accent-l); }
     </div>
     <div id="shelf-list"></div>
     <div class="shelf-pagination" id="shelf-pagination"></div>
-    <button class="export-btn" onclick="doExport()">导出全部词条</button>
   </div>
 
   <div class="view" id="view-import">
@@ -443,11 +434,42 @@ textarea#importText:focus { border-color: var(--accent-l); }
   <button data-view="import" onclick="switchView('import')">录入</button>
 </nav>
 
-<!-- 寻句悬浮按钮 -->
-<button class="seek-fab" onclick="openSeek()" title="寻句">寻</button>
-<button onclick="showCodeModal()" style="position:fixed;bottom:88px;left:20px;width:44px;height:44px;border-radius:50%;background:transparent;border:1px solid var(--line);color:var(--ink-soft);font-family:inherit;font-size:11px;letter-spacing:0.05em;cursor:pointer;z-index:200;">码</button>
+<button class="seek-fab" onclick="openSeek()">寻</button>
 
-<!-- 寻句弹层 -->
+<!-- 设置面板 -->
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsIfBg(event)">
+  <div class="settings-modal">
+    <button class="settings-close" onclick="closeSettings()">×</button>
+    <h3>设　置</h3>
+
+    <div class="settings-section">
+      <div class="settings-label">同步码</div>
+      <div class="settings-code" id="currentCode"></div>
+      <div class="settings-row">
+        <button class="settings-action" onclick="copyCode()">复制</button>
+        <button class="settings-action" onclick="showSwitchCode()">切换</button>
+      </div>
+      <div id="switchCodeArea" style="display:none;margin-top:12px;">
+        <input class="settings-input" id="newCodeInput" placeholder="输入同步码">
+        <div class="settings-row">
+          <button class="settings-action" onclick="doSwitchCode()">确认切换</button>
+          <button class="settings-action danger" onclick="hideSwitchCode()">取消</button>
+        </div>
+      </div>
+      <p class="settings-hint" style="margin-top:10px;">把同步码分享给朋友，对方输入后即可共用同一词库。不同的码完全隔离。</p>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-label">数据</div>
+      <div class="settings-row">
+        <button class="settings-action" onclick="doExport()">导出备份</button>
+      </div>
+      <p class="settings-hint" style="margin-top:8px;">导出为 txt 文件保存到本地。</p>
+    </div>
+  </div>
+</div>
+
+<!-- 寻句面板 -->
 <div class="seek-overlay" id="seekOverlay" onclick="closeSeekIfBg(event)">
   <div class="seek-modal">
     <h3>寻句</h3>
@@ -463,51 +485,60 @@ textarea#importText:focus { border-color: var(--accent-l); }
 
 <script>
 const API_BASE = 'https://shici-vault.demi89612.workers.dev';
-
-// 同步码：存在localStorage，每次请求带上
-function getCode() {
-  let code = localStorage.getItem('shici_user_code');
-  if (!code) {
-    // 首次使用，生成随机码
-    code = Math.random().toString(36).slice(2, 8) + Math.random().toString(36).slice(2, 8);
-    localStorage.setItem('shici_user_code', code);
-  }
-  return code;
-}
-
-function showCodeModal() {
-  const code = getCode();
-  const msg = `你的同步码：\n\n${code}\n\n把这个码分享给朋友，他们输入后可以看到同一个词库。\n或者输入别人的码，切换到他们的词库。`;
-  const newCode = prompt(msg + '\n\n（留空确认继续用当前码，输入新码则切换）');
-  if (newCode && newCode.trim() && newCode.trim() !== code) {
-    localStorage.setItem('shici_user_code', newCode.trim());
-    location.reload();
-  }
-}
-
 let shelfOffset = 0;
 const SHELF_LIMIT = 20;
 let shelfTotal = 0;
 let currentSpeakBtn = null;
 
-function switchView(name) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('view-' + name).classList.add('active');
-  document.querySelector(`nav button[data-view="${name}"]`).classList.add('active');
-  if (name === 'home' && !document.getElementById('home-list').children.length) loadRandom();
-  if (name === 'shelf' && !document.getElementById('shelf-list').children.length) loadShelf();
+// ── 同步码 ──
+function getCode() {
+  let code = localStorage.getItem('shici_user_code');
+  if (!code) {
+    code = Math.random().toString(36).slice(2,8) + Math.random().toString(36).slice(2,8);
+    localStorage.setItem('shici_user_code', code);
+  }
+  return code;
 }
 
+// ── 设置面板 ──
+function openSettings() {
+  document.getElementById('currentCode').textContent = getCode();
+  document.getElementById('settingsOverlay').classList.add('show');
+}
+function closeSettings() {
+  document.getElementById('settingsOverlay').classList.remove('show');
+  hideSwitchCode();
+}
+function closeSettingsIfBg(e) {
+  if (e.target === document.getElementById('settingsOverlay')) closeSettings();
+}
+function copyCode() {
+  navigator.clipboard.writeText(getCode()).then(() => alert('同步码已复制'));
+}
+function showSwitchCode() {
+  document.getElementById('switchCodeArea').style.display = 'block';
+  document.getElementById('newCodeInput').focus();
+}
+function hideSwitchCode() {
+  document.getElementById('switchCodeArea').style.display = 'none';
+  document.getElementById('newCodeInput').value = '';
+}
+function doSwitchCode() {
+  const newCode = document.getElementById('newCodeInput').value.trim();
+  if (!newCode) return;
+  localStorage.setItem('shici_user_code', newCode);
+  closeSettings();
+  location.reload();
+}
+
+// ── API ──
 async function api(path, opts = {}) {
   const code = getCode();
-  // GET请求：code加到URL参数
   let fullPath = path;
   if (!opts.method || opts.method === 'GET') {
     const sep = path.includes('?') ? '&' : '?';
     fullPath = path + sep + 'code=' + encodeURIComponent(code);
   }
-  // POST/PUT请求：code加到body
   if (opts.body && (opts.method === 'POST' || opts.method === 'PUT')) {
     try {
       const body = JSON.parse(opts.body);
@@ -520,15 +551,25 @@ async function api(path, opts = {}) {
 }
 
 function escapeHtml(s) {
-  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 function parseTags(str) {
-  if (!str || !str.trim()) return [];
+  if (!str||!str.trim()) return [];
   return str.trim().split(/\s+/).filter(Boolean);
 }
 
+// ── 视图切换 ──
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelector(`nav button[data-view="${name}"]`).classList.add('active');
+  if (name==='home' && !document.getElementById('home-list').children.length) loadRandom();
+  if (name==='shelf' && !document.getElementById('shelf-list').children.length) loadShelf();
+}
+
 // ── 卡片渲染 ──
-function renderCard(entry, showListen = false) {
+function renderCard(entry, showListen=false) {
   const div = document.createElement('div');
   div.className = 'card ' + entry.type;
   div.dataset.id = entry.id;
@@ -538,12 +579,9 @@ function renderCard(entry, showListen = false) {
   if (entry.source) html += `<div class="source">${escapeHtml(entry.source)}</div>`;
 
   const tagList = parseTags(entry.tags);
-  if (tagList.length > 0) {
-    html += `<div class="tags">${tagList.map(t =>
-      `<span class="tag" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`
-    ).join('')}</div>`;
+  if (tagList.length>0) {
+    html += `<div class="tags">${tagList.map(t=>`<span class="tag" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`).join('')}</div>`;
   }
-
   if (showListen) html += `<div class="listen-area"><button class="listen-btn">听</button></div>`;
 
   html += `<div class="actions">
@@ -562,26 +600,23 @@ function renderCard(entry, showListen = false) {
 
   html += `<div class="combined-panel">
     <div class="ety-content loading">查证中……</div>
-    <div style="text-align:right;margin-top:6px;">
-      <span class="regen-btn" onclick="regenEtymology(this)" style="font-size:11px;color:var(--ink-soft);cursor:pointer;letter-spacing:0.1em;border-bottom:1px dotted var(--ink-soft);">重新生成</span>
-    </div>
+    <div class="ety-footer"><span class="regen-btn" onclick="regenEtymology(this)">重新生成</span></div>
     <div class="panel-divider">
       <span>
         <span class="panel-tab active" onclick="switchPanelTab(this,'ask')">试问</span>
+        &nbsp;
         <span class="panel-tab" onclick="switchPanelTab(this,'notes')">笔记</span>
       </span>
     </div>
-    <div class="panel-body">
-      <div class="panel-section active ask-section">
-        <textarea class="panel-textarea" rows="2" placeholder="想问什么？留空则给出一般解读"></textarea>
-        <button class="panel-submit" onclick="doAsk(${entry.id},this)">问</button>
-        <div class="ask-answer"></div>
-      </div>
-      <div class="panel-section notes-section">
-        <div class="notes-list"></div>
-        <textarea class="panel-textarea" rows="2" placeholder="记下感想、摘录好句……"></textarea>
-        <button class="panel-submit" onclick="addNote(${entry.id},this)">存</button>
-      </div>
+    <div class="panel-section active ask-section">
+      <textarea class="panel-textarea" rows="2" placeholder="想问什么？留空则给出一般解读"></textarea>
+      <button class="panel-submit" onclick="doAsk(${entry.id},this)">问</button>
+      <div class="ask-answer"></div>
+    </div>
+    <div class="panel-section notes-section">
+      <div class="notes-list"></div>
+      <textarea class="panel-textarea" rows="2" placeholder="记下感想、摘录好句……"></textarea>
+      <button class="panel-submit" onclick="addNote(${entry.id},this)">存</button>
     </div>
   </div>`;
 
@@ -590,17 +625,15 @@ function renderCard(entry, showListen = false) {
   if (showListen) {
     const btn = div.querySelector('.listen-btn');
     btn.addEventListener('click', () => {
-      if (currentSpeakBtn && currentSpeakBtn !== btn) {
+      if (currentSpeakBtn && currentSpeakBtn!==btn) {
         speechSynthesis.cancel();
-        currentSpeakBtn.textContent = '听';
+        currentSpeakBtn.textContent='听';
         currentSpeakBtn.classList.remove('speaking');
       }
       if (btn.classList.contains('speaking')) {
         speechSynthesis.cancel();
-        btn.textContent = '听'; btn.classList.remove('speaking'); currentSpeakBtn = null;
-      } else {
-        speak(entry.content, btn);
-      }
+        btn.textContent='听'; btn.classList.remove('speaking'); currentSpeakBtn=null;
+      } else { speak(entry.content, btn); }
     });
   }
   return div;
@@ -617,40 +650,37 @@ function toggleCombined(btn) {
 
 function switchPanelTab(btn, tab) {
   const panel = btn.closest('.combined-panel');
-  panel.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  panel.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  panel.querySelector('.ask-section').classList.toggle('active', tab === 'ask');
-  panel.querySelector('.notes-section').classList.toggle('active', tab === 'notes');
-  if (tab === 'notes' && !panel.dataset.notesLoaded) loadNotes(btn.closest('.card'));
+  panel.querySelector('.ask-section').classList.toggle('active', tab==='ask');
+  panel.querySelector('.notes-section').classList.toggle('active', tab==='notes');
+  if (tab==='notes' && !panel.dataset.notesLoaded) loadNotes(btn.closest('.card'));
 }
 
-async function loadEtymology(card, force = false) {
+async function loadEtymology(card, force=false) {
   const panel = card.querySelector('.combined-panel');
   panel.dataset.etyLoaded = '1';
   const div = card.querySelector('.ety-content');
-  if (force) { div.classList.add('loading'); div.textContent = '重新生成中……'; }
-  const data = await api('/api/etymology', { method: 'POST', body: JSON.stringify({ id: parseInt(card.dataset.id), force }) });
+  if (force) { div.classList.add('loading'); div.textContent='重新生成中……'; }
+  const data = await api('/api/etymology', { method:'POST', body: JSON.stringify({ id: parseInt(card.dataset.id), force }) });
   div.classList.remove('loading');
   div.textContent = data.content || data.error || '未能查到';
 }
 
-function regenEtymology(btn) {
-  const card = btn.closest('.card');
-  loadEtymology(card, true);
-}
+function regenEtymology(btn) { loadEtymology(btn.closest('.card'), true); }
 
 async function doAsk(id, btn) {
   const section = btn.closest('.ask-section');
   const answerDiv = section.querySelector('.ask-answer');
   answerDiv.textContent = '寻思中……';
-  const data = await api('/api/ask', { method: 'POST', body: JSON.stringify({ id, question: section.querySelector('textarea').value }) });
+  const data = await api('/api/ask', { method:'POST', body: JSON.stringify({ id, question: section.querySelector('textarea').value }) });
   const answer = data.content || data.error || '暂无回应';
   answerDiv.textContent = answer;
   const m = answer.match(/《([^》]+)》/);
   if (m) {
     const a = document.createElement('a');
-    a.href = `https://www.gushiwen.cn/search.aspx?value=${encodeURIComponent(m[1])}`;
-    a.target = '_blank'; a.textContent = `查全诗：《${m[1]}》→`;
+    a.href=`https://www.gushiwen.cn/search.aspx?value=${encodeURIComponent(m[1])}`;
+    a.target='_blank'; a.textContent=`查全诗：《${m[1]}》→`;
     answerDiv.appendChild(a);
   }
 }
@@ -661,7 +691,7 @@ async function loadNotes(card) {
   const data = await api(`/api/entry/${card.dataset.id}/notes`);
   const list = card.querySelector('.notes-list');
   list.innerHTML = '';
-  (data.notes || []).forEach(n => renderNoteItem(list, n));
+  (data.notes||[]).forEach(n=>renderNoteItem(list,n));
 }
 
 function renderNoteItem(list, note) {
@@ -676,13 +706,13 @@ async function addNote(entryId, btn) {
   const textarea = section.querySelector('textarea');
   const content = textarea.value.trim();
   if (!content) return;
-  const data = await api(`/api/entry/${entryId}/notes`, { method: 'POST', body: JSON.stringify({ content }) });
-  if (data.id) { renderNoteItem(section.querySelector('.notes-list'), data); textarea.value = ''; }
+  const data = await api(`/api/entry/${entryId}/notes`, { method:'POST', body: JSON.stringify({ content }) });
+  if (data.id) { renderNoteItem(section.querySelector('.notes-list'), data); textarea.value=''; }
 }
 
 async function deleteNote(noteId, btn) {
   if (!confirm('删除这条笔记？')) return;
-  await api(`/api/note/${noteId}`, { method: 'DELETE' });
+  await api(`/api/note/${noteId}`, { method:'DELETE' });
   btn.closest('.note-item').remove();
 }
 
@@ -693,64 +723,61 @@ function toggleTagEdit(btn) {
 async function saveTags(id, btn) {
   const input = btn.previousElementSibling;
   const tags = input.value.trim();
-  await api(`/api/entry/${id}`, { method: 'PUT', body: JSON.stringify({ tags }) });
+  await api(`/api/entry/${id}`, { method:'PUT', body: JSON.stringify({ tags }) });
   const card = btn.closest('.card');
   card.querySelector('.tag-edit-panel').classList.remove('show');
   let tagDiv = card.querySelector('.tags');
   const tagList = parseTags(tags);
-  if (tagList.length > 0) {
+  if (tagList.length>0) {
     if (!tagDiv) {
-      tagDiv = document.createElement('div'); tagDiv.className = 'tags';
-      (card.querySelector('.source') || card.querySelector('.note') || card.querySelector('.content')).insertAdjacentElement('afterend', tagDiv);
+      tagDiv = document.createElement('div'); tagDiv.className='tags';
+      (card.querySelector('.source')||card.querySelector('.note')||card.querySelector('.content')).insertAdjacentElement('afterend',tagDiv);
     }
-    tagDiv.innerHTML = tagList.map(t => `<span class="tag" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`).join('');
+    tagDiv.innerHTML = tagList.map(t=>`<span class="tag" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`).join('');
   } else if (tagDiv) tagDiv.remove();
 }
 
 function filterByTag(tag) {
   switchView('shelf');
   document.getElementById('shelfSearch').value = tag;
-  shelfOffset = 0; loadShelf({ q: tag, mode: 'keyword' });
+  shelfOffset=0; loadShelf({q:tag,mode:'keyword'});
 }
 
 async function editEntry(id, btn) {
   const card = btn.closest('.card');
   const contentDiv = card.querySelector('.content');
   const updated = prompt('编辑内容：', contentDiv.textContent);
-  if (updated === null || updated === contentDiv.textContent) return;
-  await api(`/api/entry/${id}`, { method: 'PUT', body: JSON.stringify({ content: updated }) });
+  if (updated===null||updated===contentDiv.textContent) return;
+  await api(`/api/entry/${id}`, { method:'PUT', body: JSON.stringify({ content: updated }) });
   contentDiv.textContent = updated;
 }
 
 async function deleteEntry(id, btn) {
   if (!confirm('确定删除这一条？')) return;
-  await api(`/api/entry/${id}`, { method: 'DELETE' });
+  await api(`/api/entry/${id}`, { method:'DELETE' });
   btn.closest('.card').remove();
 }
 
 function pickBestVoice() {
   const voices = speechSynthesis.getVoices();
-  // 优先粤语优化音质
-  const cantoneseKeywords = ['善宜', 'sin-ji', 'sinji', 'mei-jia', 'meijia', 'enhanced'];
-  for (const k of cantoneseKeywords) {
-    const v = voices.find(v => v.name.toLowerCase().includes(k) && (v.lang === 'zh-HK' || v.lang === 'yue'));
+  const cantoneseKeys = ['善宜', 'sin-ji', 'sinji', 'enhanced'];
+  for (const k of cantoneseKeys) {
+    const v = voices.find(v=>v.name.toLowerCase().includes(k)&&(v.lang==='zh-HK'||v.lang==='yue'));
     if (v) return v;
   }
-  // 退而求其次：任何粤语
-  const cantonese = voices.find(v => v.lang === 'zh-HK' || v.lang === 'yue-HK');
-  if (cantonese) return cantonese;
-  // 再退：任何中文
-  return voices.find(v => v.lang.startsWith('zh')) || voices[0];
+  return voices.find(v=>v.lang==='zh-HK'||v.lang==='yue-HK')
+      || voices.find(v=>v.lang.startsWith('zh'))
+      || voices[0];
 }
 
 function speak(text, btn) {
   speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'zh-HK'; utter.rate = 0.72;
+  utter.lang='zh-HK'; utter.rate=0.72;
   const voice = pickBestVoice();
   if (voice) utter.voice = voice;
-  utter.onstart = () => { if (btn) { btn.textContent = '停'; btn.classList.add('speaking'); currentSpeakBtn = btn; } };
-  utter.onend = utter.onerror = () => { if (btn) { btn.textContent = '听'; btn.classList.remove('speaking'); } currentSpeakBtn = null; };
+  utter.onstart = ()=>{ if(btn){btn.textContent='停';btn.classList.add('speaking');currentSpeakBtn=btn;} };
+  utter.onend = utter.onerror = ()=>{ if(btn){btn.textContent='听';btn.classList.remove('speaking');} currentSpeakBtn=null; };
   speechSynthesis.speak(utter);
 }
 
@@ -759,141 +786,137 @@ async function loadRandom() {
   list.innerHTML = '<div class="empty">翻阅中……</div>';
   const data = await api('/api/random?n=8');
   list.innerHTML = '';
-  if (!data.entries || data.entries.length === 0) {
-    list.innerHTML = '<div class="empty">库里还空着，去「录入」添加一些吧</div>'; return;
+  if (!data.entries||data.entries.length===0) {
+    list.innerHTML='<div class="empty">库里还空着，去「录入」添加一些吧</div>'; return;
   }
-  data.entries.forEach(e => list.appendChild(renderCard(e, true)));
+  data.entries.forEach(e=>list.appendChild(renderCard(e,true)));
 }
 
-async function loadShelf(opts = {}) {
+async function loadShelf(opts={}) {
   const list = document.getElementById('shelf-list');
   list.innerHTML = '<div class="empty">翻阅中……</div>';
-  const q = opts.q !== undefined ? opts.q : document.getElementById('shelfSearch').value.trim();
-  const mode = opts.mode || document.getElementById('shelfMode').value;
+  const q = opts.q!==undefined ? opts.q : document.getElementById('shelfSearch').value.trim();
+  const mode = opts.mode||document.getElementById('shelfMode').value;
   let data;
   if (q) {
-    if (mode === 'semantic') {
-      data = await api('/api/semantic', { method: 'POST', body: JSON.stringify({ query: q, n: 20 }) });
+    if (mode==='semantic') {
+      data = await api('/api/semantic',{method:'POST',body:JSON.stringify({query:q,n:20})});
     } else {
       data = await api(`/api/search?q=${encodeURIComponent(q)}`);
     }
-    data.total = (data.entries || []).length;
+    data.total = (data.entries||[]).length;
   } else {
     data = await api(`/api/entries?limit=${SHELF_LIMIT}&offset=${shelfOffset}`);
   }
-  list.innerHTML = '';
-  shelfTotal = data.total || 0;
-  if (!data.entries || data.entries.length === 0) {
-    list.innerHTML = '<div class="empty">没有找到相符的</div>';
+  list.innerHTML='';
+  shelfTotal = data.total||0;
+  if (!data.entries||data.entries.length===0) {
+    list.innerHTML='<div class="empty">没有找到相符的</div>';
     renderPagination(q); return;
   }
-  data.entries.forEach(e => list.appendChild(renderCard(e, false)));
+  data.entries.forEach(e=>list.appendChild(renderCard(e,false)));
   renderPagination(q);
 }
 
 function renderPagination(q) {
   const pg = document.getElementById('shelf-pagination');
-  if (q) { pg.innerHTML = ''; return; }
-  const totalPages = Math.ceil(shelfTotal / SHELF_LIMIT);
-  const currentPage = Math.floor(shelfOffset / SHELF_LIMIT) + 1;
-  pg.innerHTML = '';
-  if (shelfOffset > 0) {
-    const prev = document.createElement('span');
-    prev.textContent = '← 前页';
-    prev.onclick = () => { shelfOffset -= SHELF_LIMIT; loadShelf(); };
+  if (q) { pg.innerHTML=''; return; }
+  const totalPages = Math.ceil(shelfTotal/SHELF_LIMIT);
+  const currentPage = Math.floor(shelfOffset/SHELF_LIMIT)+1;
+  pg.innerHTML='';
+  if (shelfOffset>0) {
+    const prev=document.createElement('span');
+    prev.textContent='← 前页';
+    prev.onclick=()=>{shelfOffset-=SHELF_LIMIT;loadShelf();};
     pg.appendChild(prev);
   }
-  const info = document.createElement('span');
-  info.className = 'page-info';
-  info.textContent = `${currentPage} / ${totalPages || 1}（共 ${shelfTotal} 条）`;
+  const info=document.createElement('span');
+  info.className='page-info';
+  info.textContent=`${currentPage} / ${totalPages||1}（共 ${shelfTotal} 条）`;
   pg.appendChild(info);
-  if (shelfOffset + SHELF_LIMIT < shelfTotal) {
-    const next = document.createElement('span');
-    next.textContent = '后页 →';
-    next.onclick = () => { shelfOffset += SHELF_LIMIT; loadShelf(); };
+  if (shelfOffset+SHELF_LIMIT<shelfTotal) {
+    const next=document.createElement('span');
+    next.textContent='后页 →';
+    next.onclick=()=>{shelfOffset+=SHELF_LIMIT;loadShelf();};
     pg.appendChild(next);
   }
 }
 
-async function doShelfSearch() { shelfOffset = 0; loadShelf(); }
+async function doShelfSearch() { shelfOffset=0; loadShelf(); }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('shelfSearch').addEventListener('keydown', e => {
-    if (e.key === 'Enter') doShelfSearch();
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('shelfSearch').addEventListener('keydown',e=>{
+    if(e.key==='Enter') doShelfSearch();
   });
 });
 
 async function doExport() {
   const data = await api('/api/export');
-  if (!data.entries || data.entries.length === 0) { alert('词库为空'); return; }
-  const lines = data.entries.map(e => {
-    let s = e.content;
-    if (e.source) s += `\n——${e.source}`;
-    if (e.note) s += `\n［${e.note}］`;
-    if (e.tags) s += `\n#${parseTags(e.tags).join(' #')}`;
+  if (!data.entries||data.entries.length===0) { alert('词库为空'); return; }
+  const lines = data.entries.map(e=>{
+    let s=e.content;
+    if(e.source) s+=`\n——${e.source}`;
+    if(e.note) s+=`\n［${e.note}］`;
+    if(e.tags) s+=`\n#${parseTags(e.tags).join(' #')}`;
     return s;
   });
-  const blob = new Blob([lines.join('\n\n───\n\n')], { type: 'text/plain;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `拾遗_${new Date().toLocaleDateString('zh-CN')}.txt`;
+  const blob=new Blob([lines.join('\n\n───\n\n')],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`拾遗_${new Date().toLocaleDateString('zh-CN')}.txt`;
   a.click();
 }
 
 async function doImport() {
-  const text = document.getElementById('importText').value;
-  if (!text.trim()) return;
-  const resultDiv = document.getElementById('import-result');
-  resultDiv.innerHTML = '<div class="empty">整理中，请稍候……</div>';
-  const data = await api('/api/import', { method: 'POST', body: JSON.stringify({ text }) });
-  if (data.error) { resultDiv.innerHTML = `<div class="empty">出错了：${escapeHtml(data.error)}</div>`; return; }
-  resultDiv.innerHTML = `<p style="font-size:12px;color:var(--ink-soft);margin:12px 0 8px;letter-spacing:0.1em;">已收入 ${data.count} 条</p>`;
-  data.inserted.forEach(e => resultDiv.appendChild(renderCard(e, false)));
-  document.getElementById('importText').value = '';
+  const text=document.getElementById('importText').value;
+  if(!text.trim()) return;
+  const resultDiv=document.getElementById('import-result');
+  resultDiv.innerHTML='<div class="empty">整理中，请稍候……</div>';
+  const data=await api('/api/import',{method:'POST',body:JSON.stringify({text})});
+  if(data.error){resultDiv.innerHTML=`<div class="empty">出错了：${escapeHtml(data.error)}</div>`;return;}
+  resultDiv.innerHTML=`<p style="font-size:12px;color:var(--ink-soft);margin:12px 0 8px;">已收入 ${data.count} 条</p>`;
+  data.inserted.forEach(e=>resultDiv.appendChild(renderCard(e,false)));
+  document.getElementById('importText').value='';
 }
 
 // ── 寻句 ──
 function openSeek() { document.getElementById('seekOverlay').classList.add('show'); }
 function closeSeek() {
   document.getElementById('seekOverlay').classList.remove('show');
-  document.getElementById('seekResults').innerHTML = '';
-  document.getElementById('seekInput').value = '';
+  document.getElementById('seekResults').innerHTML='';
+  document.getElementById('seekInput').value='';
 }
-function closeSeekIfBg(e) { if (e.target === document.getElementById('seekOverlay')) closeSeek(); }
+function closeSeekIfBg(e) { if(e.target===document.getElementById('seekOverlay')) closeSeek(); }
 
 async function doSeek() {
-  const q = document.getElementById('seekInput').value.trim();
-  if (!q) return;
-  const results = document.getElementById('seekResults');
-  results.innerHTML = '<div class="empty">寻思中……</div>';
-
-  const workerData = await api('/api/seek', { method: 'POST', body: JSON.stringify({ query: q }) });
-
-  results.innerHTML = '';
-  if (!workerData.results || workerData.results.length === 0) {
-    results.innerHTML = '<div class="empty">未能找到相符的句子</div>'; return;
+  const q=document.getElementById('seekInput').value.trim();
+  if(!q) return;
+  const results=document.getElementById('seekResults');
+  results.innerHTML='<div class="empty">寻思中……</div>';
+  const data=await api('/api/seek',{method:'POST',body:JSON.stringify({query:q})});
+  results.innerHTML='';
+  if(!data.results||data.results.length===0){
+    results.innerHTML='<div class="empty">未能找到相符的句子</div>'; return;
   }
-  workerData.results.forEach(r => {
-    const div = document.createElement('div');
-    div.className = 'seek-result-item';
-    div.innerHTML = `
+  data.results.forEach(r=>{
+    const div=document.createElement('div');
+    div.className='seek-result-item';
+    div.innerHTML=`
       <div style="flex:1">
         <div class="seek-result-text">${escapeHtml(r.verse)}</div>
-        <div class="seek-result-source">${escapeHtml(r.source || '')}${r.reason ? ' · ' + escapeHtml(r.reason) : ''}</div>
+        <div class="seek-result-source">${escapeHtml(r.source||'')}${r.reason?' · '+escapeHtml(r.reason):''}</div>
       </div>
-      <button class="seek-adopt" onclick="adoptVerse('${escapeHtml(r.verse)}','${escapeHtml(r.source||'')}')">收入</button>
-    `;
+      <button class="seek-adopt" onclick="adoptVerse('${escapeHtml(r.verse)}','${escapeHtml(r.source||'')}')">收入</button>`;
     results.appendChild(div);
   });
 }
 
-function adoptVerse(verse, source) {
-  const importText = document.getElementById('importText');
-  const current = importText.value.trim();
-  const toAdd = source ? `${verse}\n${source}` : verse;
-  importText.value = current ? current + '\n\n' + toAdd : toAdd;
-  closeSeek();
-  switchView('import');
+function adoptVerse(verse,source) {
+  const importText=document.getElementById('importText');
+  const current=importText.value.trim();
+  const toAdd=source?`${verse}\n${source}`:verse;
+  importText.value=current?current+'\n\n'+toAdd:toAdd;
+  closeSeek(); switchView('import');
 }
 
 loadRandom();
