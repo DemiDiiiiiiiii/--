@@ -525,6 +525,9 @@ function renderCard(entry, showListen = false) {
 
   html += `<div class="combined-panel">
     <div class="ety-content loading">查证中……</div>
+    <div style="text-align:right;margin-top:6px;">
+      <span class="regen-btn" onclick="regenEtymology(this)" style="font-size:11px;color:var(--ink-soft);cursor:pointer;letter-spacing:0.1em;border-bottom:1px dotted var(--ink-soft);">重新生成</span>
+    </div>
     <div class="panel-divider">
       <span>
         <span class="panel-tab active" onclick="switchPanelTab(this,'ask')">试问</span>
@@ -584,13 +587,19 @@ function switchPanelTab(btn, tab) {
   if (tab === 'notes' && !panel.dataset.notesLoaded) loadNotes(btn.closest('.card'));
 }
 
-async function loadEtymology(card) {
+async function loadEtymology(card, force = false) {
   const panel = card.querySelector('.combined-panel');
   panel.dataset.etyLoaded = '1';
   const div = card.querySelector('.ety-content');
-  const data = await api('/api/etymology', { method: 'POST', body: JSON.stringify({ id: parseInt(card.dataset.id) }) });
+  if (force) { div.classList.add('loading'); div.textContent = '重新生成中……'; }
+  const data = await api('/api/etymology', { method: 'POST', body: JSON.stringify({ id: parseInt(card.dataset.id), force }) });
   div.classList.remove('loading');
   div.textContent = data.content || data.error || '未能查到';
+}
+
+function regenEtymology(btn) {
+  const card = btn.closest('.card');
+  loadEtymology(card, true);
 }
 
 async function doAsk(id, btn) {
