@@ -8,15 +8,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&display=swap');
 
 :root {
-  --paper:     #f2f0ec;
-  --paper-card:#f8f7f4;
-  --ink:       #1a1917;
-  --ink-mid:   #3d3b38;
-  --ink-soft:  #8a8680;
-  --line:      #d6d3cd;
-  --accent:    #3d5a6e;
-  --accent-l:  #8aaabb;
-  --accent-dim:#c8d8e0;
+  --paper:     #f4f2ed;
+  --paper-card:#faf9f6;
+  --ink:       #0f0e0c;
+  --ink-mid:   #2e2c29;
+  --ink-soft:  #6e6a64;
+  --line:      #ccc8c0;
+  --accent:    #2d4a5e;
+  --accent-l:  #7a9aab;
+  --accent-dim:#b8cfd8;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,13 +49,14 @@ header .sub {
   letter-spacing: 0.5em; text-indent: 0.5em;
 }
 .settings-btn {
-  position: absolute; top: 20px; right: 16px;
+  position: absolute; top: 22px; right: 18px;
   background: none; border: none;
-  font-size: 18px; color: var(--ink-soft);
-  cursor: pointer; padding: 4px;
-  line-height: 1;
+  font-family: inherit; font-size: 12px;
+  color: var(--ink-soft); letter-spacing: 0.2em;
+  cursor: pointer; padding: 2px 0;
+  border-bottom: 1px solid transparent;
 }
-.settings-btn:hover { color: var(--accent); }
+.settings-btn:hover { color: var(--accent); border-color: var(--accent); }
 
 /* ── 设置弹层 ── */
 .settings-overlay {
@@ -398,7 +399,7 @@ textarea#importText:focus { border-color: var(--accent-l); }
 <header>
   <h1>拾遗</h1>
   <div class="sub">古语 · 旧句 · 私藏</div>
-  <button class="settings-btn" onclick="openSettings()" title="设置">⚙</button>
+  <button class="settings-btn" onclick="openSettings()" title="设置">置</button>
 </header>
 
 <main>
