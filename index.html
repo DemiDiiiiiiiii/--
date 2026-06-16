@@ -231,21 +231,7 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   font-size: 11px; color: var(--ink-soft); cursor: pointer;
   letter-spacing: 0.1em; border-bottom: 1px dotted var(--ink-soft);
 }
-.panel-divider {
-  margin: 14px 0 10px; display: flex;
-  align-items: center; gap: 10px;
-}
-.panel-divider::before, .panel-divider::after {
-  content: ''; flex: 1; height: 1px; background: var(--line);
-}
-.panel-tab {
-  font-size: 11.5px; color: var(--ink-soft); cursor: pointer;
-  letter-spacing: 0.15em; padding-bottom: 1px;
-  border-bottom: 1px solid transparent;
-}
-.panel-tab.active { color: var(--accent); border-color: var(--accent); }
-.panel-section { display: none; }
-.panel-section.active { display: block; }
+
 .panel-textarea {
   width: 100%; font-family: inherit; font-size: 13px;
   border: none; border-bottom: 1px solid var(--line);
@@ -269,6 +255,22 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   display: inline-block; margin-top: 6px;
   font-size: 12px; color: var(--accent); text-decoration: none;
 }
+.panel-sep {
+  height: 1px; background: var(--line);
+  margin: 14px 0;
+}
+.panel-section-label {
+  font-size: 11px; color: var(--ink-soft);
+  letter-spacing: 0.2em; margin-bottom: 8px;
+}
+.save-to-note-btn {
+  display: inline-block; margin-top: 8px;
+  font-family: inherit; font-size: 11px;
+  border: 1px solid var(--accent-dim); background: none;
+  color: var(--accent); border-radius: 2px;
+  padding: 3px 10px; cursor: pointer; letter-spacing: 0.1em;
+}
+.save-to-note-btn:disabled { color: var(--ink-soft); border-color: var(--line); cursor: default; }
 .notes-list { margin-bottom: 8px; }
 .note-item {
   display: flex; justify-content: space-between;
@@ -602,19 +604,16 @@ function renderCard(entry, showListen=false) {
   html += `<div class="combined-panel">
     <div class="ety-content loading">查证中……</div>
     <div class="ety-footer"><span class="regen-btn" onclick="regenEtymology(this)">重新生成</span></div>
-    <div class="panel-divider">
-      <span>
-        <span class="panel-tab active" onclick="switchPanelTab(this,'ask')">试问</span>
-        &nbsp;
-        <span class="panel-tab" onclick="switchPanelTab(this,'notes')">笔记</span>
-      </span>
-    </div>
-    <div class="panel-section active ask-section">
+    <div class="panel-sep"></div>
+    <div class="ask-section">
+      <div class="panel-section-label">试问</div>
       <textarea class="panel-textarea" rows="2" placeholder="想问什么？留空则给出一般解读"></textarea>
       <button class="panel-submit" onclick="doAsk(${entry.id},this)">问</button>
       <div class="ask-answer"></div>
     </div>
-    <div class="panel-section notes-section">
+    <div class="panel-sep"></div>
+    <div class="notes-section">
+      <div class="panel-section-label">笔记</div>
       <div class="notes-list"></div>
       <textarea class="panel-textarea" rows="2" placeholder="记下感想、摘录好句……"></textarea>
       <button class="panel-submit" onclick="addNote(${entry.id},this)">存</button>
@@ -649,14 +648,7 @@ function toggleCombined(btn) {
   if (show && !panel.dataset.etyLoaded) loadEtymology(card);
 }
 
-function switchPanelTab(btn, tab) {
-  const panel = btn.closest('.combined-panel');
-  panel.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  panel.querySelector('.ask-section').classList.toggle('active', tab==='ask');
-  panel.querySelector('.notes-section').classList.toggle('active', tab==='notes');
-  if (tab==='notes' && !panel.dataset.notesLoaded) loadNotes(btn.closest('.card'));
-}
+
 
 async function loadEtymology(card, force=false) {
   const panel = card.querySelector('.combined-panel');
@@ -666,6 +658,8 @@ async function loadEtymology(card, force=false) {
   const data = await api('/api/etymology', { method:'POST', body: JSON.stringify({ id: parseInt(card.dataset.id), force }) });
   div.classList.remove('loading');
   div.textContent = data.content || data.error || '未能查到';
+  // 自动加载笔记
+  if (!panel.dataset.notesLoaded) loadNotes(card);
 }
 
 function regenEtymology(btn) { loadEtymology(btn.closest('.card'), true); }
@@ -677,6 +671,19 @@ async function doAsk(id, btn) {
   const data = await api('/api/ask', { method:'POST', body: JSON.stringify({ id, question: section.querySelector('textarea').value }) });
   const answer = data.content || data.error || '暂无回应';
   answerDiv.textContent = answer;
+  // 存入笔记按钮
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'save-to-note-btn';
+  saveBtn.textContent = '存入笔记';
+  saveBtn.onclick = () => {
+    const card = saveBtn.closest('.card');
+    const noteTextarea = card.querySelector('.notes-section textarea');
+    noteTextarea.value = answer;
+    noteTextarea.focus();
+    saveBtn.textContent = '已填入笔记框';
+    saveBtn.disabled = true;
+  };
+  answerDiv.appendChild(saveBtn);
   const m = answer.match(/《([^》]+)》/);
   if (m) {
     const a = document.createElement('a');
