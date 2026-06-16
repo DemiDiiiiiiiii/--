@@ -255,14 +255,27 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   display: inline-block; margin-top: 6px;
   font-size: 12px; color: var(--accent); text-decoration: none;
 }
-.panel-sep {
-  height: 1px; background: var(--line);
-  margin: 14px 0;
+.sub-actions {
+  display: flex; gap: 20px;
+  margin-top: 16px; padding-top: 12px;
+  border-top: 1px solid var(--line);
 }
-.panel-section-label {
-  font-size: 11px; color: var(--ink-soft);
-  letter-spacing: 0.2em; margin-bottom: 8px;
+.sub-actions span {
+  font-size: 12px; color: var(--ink-soft);
+  letter-spacing: 0.2em; cursor: pointer;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
 }
+.sub-actions span:hover { color: var(--accent); }
+.sub-actions span.active-action {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.sub-panel {
+  display: none; margin-top: 12px;
+  padding-top: 12px; border-top: 1px solid var(--line);
+}
+.sub-panel.open { display: block; }
 .save-to-note-btn {
   display: inline-block; margin-top: 8px;
   font-family: inherit; font-size: 11px;
@@ -603,17 +616,19 @@ function renderCard(entry, showListen=false) {
 
   html += `<div class="combined-panel">
     <div class="ety-content loading">查证中……</div>
-    <div class="ety-footer"><span class="regen-btn" onclick="regenEtymology(this)">重新生成</span></div>
-    <div class="panel-sep"></div>
-    <div class="ask-section">
-      <div class="panel-section-label">试问</div>
+    <div class="ety-footer">
+      <span class="regen-btn" onclick="regenEtymology(this)">重新生成</span>
+    </div>
+    <div class="sub-actions">
+      <span onclick="toggleSubPanel(this,'ask-section')">试问</span>
+      <span onclick="toggleSubPanel(this,'notes-section')">笔记</span>
+    </div>
+    <div class="ask-section sub-panel">
       <textarea class="panel-textarea" rows="2" placeholder="想问什么？留空则给出一般解读"></textarea>
       <button class="panel-submit" onclick="doAsk(${entry.id},this)">问</button>
       <div class="ask-answer"></div>
     </div>
-    <div class="panel-sep"></div>
-    <div class="notes-section">
-      <div class="panel-section-label">笔记</div>
+    <div class="notes-section sub-panel">
       <div class="notes-list"></div>
       <textarea class="panel-textarea" rows="2" placeholder="记下感想、摘录好句……"></textarea>
       <button class="panel-submit" onclick="addNote(${entry.id},this)">存</button>
@@ -658,11 +673,23 @@ async function loadEtymology(card, force=false) {
   const data = await api('/api/etymology', { method:'POST', body: JSON.stringify({ id: parseInt(card.dataset.id), force }) });
   div.classList.remove('loading');
   div.textContent = data.content || data.error || '未能查到';
-  // 自动加载笔记
-  if (!panel.dataset.notesLoaded) loadNotes(card);
+
 }
 
 function regenEtymology(btn) { loadEtymology(btn.closest('.card'), true); }
+
+function toggleSubPanel(btn, panelClass) {
+  const combined = btn.closest('.combined-panel');
+  const panel = combined.querySelector('.' + panelClass);
+  const isOpen = panel.classList.contains('open');
+  // 收起再展开（两个可以同时展开）
+  panel.classList.toggle('open', !isOpen);
+  btn.classList.toggle('active-action', !isOpen);
+  if (!isOpen && panelClass === 'notes-section') {
+    const card = btn.closest('.card');
+    if (!combined.dataset.notesLoaded) loadNotes(card);
+  }
+}
 
 async function doAsk(id, btn) {
   const section = btn.closest('.ask-section');
