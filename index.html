@@ -409,21 +409,7 @@ textarea#importText:focus { border-color: var(--accent-l); }
 }
 
 .empty { text-align: center; color: var(--ink-soft); font-size: 13px; padding: 40px 0; letter-spacing: 0.1em; }
-.import-actions { display: flex; gap: 10px; margin-top: 12px; }
-.import-actions .primary-btn,
-.import-actions .photo-btn {
-  flex: 1; height: 44px;
-  font-family: inherit; font-size: 13px;
-  letter-spacing: 0.2em; cursor: pointer;
-  border-radius: 2px; padding: 0;
-}
-.import-actions .primary-btn {
-  background: var(--accent); color: #f8f7f4; border: none;
-}
-.import-actions .photo-btn {
-  background: none; color: var(--accent);
-  border: 1.5px solid var(--accent);
-}
+
 </style>
 </head>
 <body>
@@ -456,12 +442,7 @@ textarea#importText:focus { border-color: var(--accent-l); }
   <div class="view" id="view-import">
     <p class="import-hint">把摘抄的文本整段粘贴进来，系统只做切分整理，不会自动添加解释。</p>
     <textarea id="importText" placeholder="粘贴一段或多段摘抄……"></textarea>
-    <div class="import-actions">
-      <button class="primary-btn" onclick="doImport()">整理入库</button>
-      <button class="photo-btn" onclick="document.getElementById('photoInput').click()">拍照识别</button>
-    </div>
-    <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="doPhotoImport(this)">
-    <div id="photo-status"></div>
+    <button class="primary-btn" onclick="doImport()">整理入库</button>
     <div id="import-result"></div>
   </div>
 </main>
@@ -957,39 +938,7 @@ async function doExport() {
   a.click();
 }
 
-async function doPhotoImport(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const status = document.getElementById('photo-status');
-  status.innerHTML = '<div class="empty">识别中……</div>';
 
-  // 转base64
-  const base64 = await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-
-  const data = await api('/api/ocr', {
-    method: 'POST',
-    body: JSON.stringify({ image: base64, mime_type: file.type })
-  });
-
-  input.value = ''; // 清空input，允许重复拍照
-  status.innerHTML = '';
-
-  if (data.error) {
-    status.innerHTML = `<div class="empty">识别失败：${escapeHtml(data.error)}</div>`;
-    return;
-  }
-
-  // 填进录入框
-  const importText = document.getElementById('importText');
-  const current = importText.value.trim();
-  importText.value = current ? current + '\n\n' + data.text : data.text;
-  status.innerHTML = '<div class="empty" style="padding:10px 0;color:var(--accent);">识别完成，请确认后点「整理入库」</div>';
-}
 
 async function doImport() {
   const text=document.getElementById('importText').value;
