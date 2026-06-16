@@ -822,7 +822,7 @@ async function loadShelf(opts={}) {
     list.innerHTML='<div class="empty">没有找到相符的</div>';
     renderPagination(q); return;
   }
-  data.entries.forEach(e=>list.appendChild(renderCard(e,false)));
+  data.entries.forEach(e=>list.appendChild(renderCard(e,true)));
   renderPagination(q);
 }
 
@@ -883,7 +883,7 @@ async function doImport() {
   const data=await api('/api/import',{method:'POST',body:JSON.stringify({text})});
   if(data.error){resultDiv.innerHTML=`<div class="empty">出错了：${escapeHtml(data.error)}</div>`;return;}
   resultDiv.innerHTML=`<p style="font-size:12px;color:var(--ink-soft);margin:12px 0 8px;">已收入 ${data.count} 条</p>`;
-  data.inserted.forEach(e=>resultDiv.appendChild(renderCard(e,false)));
+  data.inserted.forEach(e=>resultDiv.appendChild(renderCard(e,true)));
   document.getElementById('importText').value='';
 }
 
