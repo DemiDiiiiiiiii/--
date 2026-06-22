@@ -702,7 +702,17 @@ async function loadEtymology(card, force=false) {
   const data = await api('/api/etymology', { method:'POST', body: JSON.stringify({ id: parseInt(card.dataset.id), force }) });
   div.classList.remove('loading');
   div.textContent = data.content || data.error || '未能查到';
-
+  // 查原文核实链接
+  const contentText = card.querySelector('.content').textContent.trim().slice(0, 12);
+  let verifyLink = card.querySelector('.verify-link');
+  if (!verifyLink) {
+    verifyLink = document.createElement('a');
+    verifyLink.className = 'verify-link';
+    verifyLink.target = '_blank';
+    verifyLink.textContent = '查原文核实 →';
+    card.querySelector('.ety-footer').prepend(verifyLink);
+  }
+  verifyLink.href = `https://www.gushiwen.cn/search.aspx?value=${encodeURIComponent(contentText)}`;
 }
 
 function regenEtymology(btn) { loadEtymology(btn.closest('.card'), true); }
