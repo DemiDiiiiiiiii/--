@@ -220,7 +220,7 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
 }
 .combined-panel.show { display: block; }
 .ety-content {
-  font-size: 13.5px; color: var(--ink-mid);
+  font-size: 13.5px; color: #2a3540;
   line-height: 2.1; white-space: pre-wrap;
   word-break: break-word;
 }
@@ -232,6 +232,12 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
 .regen-btn, .edit-ety-btn {
   font-size: 11px; color: var(--ink-soft); cursor: pointer;
   letter-spacing: 0.1em; border-bottom: 1px dotted var(--ink-soft);
+}
+.verify-link {
+  font-size: 11px; color: var(--accent);
+  letter-spacing: 0.1em; text-decoration: none;
+  border-bottom: 1px dotted var(--accent);
+  margin-right: auto;
 }
 
 .panel-textarea {
@@ -275,9 +281,25 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
 }
 .sub-panel {
   display: none; margin-top: 12px;
-  padding-top: 12px; border-top: 1px solid var(--line);
 }
 .sub-panel.open { display: block; }
+.ask-section.sub-panel.open {
+  background: #eef3f6;
+  border-radius: 2px;
+  padding: 12px 14px;
+  margin-left: -14px; margin-right: -14px;
+}
+.notes-section.sub-panel.open {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.panel-discard {
+  font-family: inherit; font-size: 12px;
+  border: none; background: none;
+  color: var(--ink-soft); cursor: pointer;
+  letter-spacing: 0.15em; padding: 4px 0;
+}
+.panel-discard:hover { color: var(--ink); }
 .save-to-note-btn {
   display: inline-block; margin-top: 8px;
   font-family: inherit; font-size: 11px;
@@ -635,7 +657,10 @@ function renderCard(entry, showListen=false) {
     <div class="notes-section sub-panel">
       <div class="notes-list"></div>
       <textarea class="panel-textarea" rows="2" placeholder="记下感想、摘录好句……"></textarea>
-      <button class="panel-submit" onclick="addNote(${entry.id},this)">存</button>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button class="panel-submit" onclick="addNote(${entry.id},this)">存</button>
+        <button class="panel-discard" onclick="this.closest('.notes-section').querySelector('textarea').value=''">弃</button>
+      </div>
     </div>
   </div>`;
 
