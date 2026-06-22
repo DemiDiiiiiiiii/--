@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>拾遗</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&display=swap');
+
+:root {
+  --paper:     #f4f2ed;
+  --paper-card:#faf9f6;
+  --ink:       #0f0e0c;
+  --ink-mid:   #2e2c29;
+  --ink-soft:  #6e6a64;
+  --line:      #ccc8c0;
+  --accent:    #2d4a5e;
+  --accent-l:  #7a9aab;
+  --accent-dim:#b8cfd8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  background-color: var(--paper);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 300px 300px;
+  color: var(--ink);
+  line-height: 2;
+  padding-bottom: 80px;
+  min-height: 100vh;
+}
+
+/* ── 页头 ── */
+header {
+  padding: 36px 20px 18px;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+header h1 {
+  font-size: 34px; font-weight: 300;
+  letter-spacing: 0.7em; text-indent: 0.7em;
+  color: var(--ink); margin-bottom: 4px;
+}
+header .sub {
+  font-size: 11px; color: var(--ink-soft);
+  letter-spacing: 0.5em; text-indent: 0.5em;
+}
+.settings-btn {
+  position: absolute; top: 22px; right: 18px;
+  background: none; border: none;
+  font-family: inherit; font-size: 12px;
+  color: var(--ink-soft); letter-spacing: 0.2em;
+  cursor: pointer; padding: 2px 0;
+  border-bottom: 1px solid transparent;
+}
+.settings-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ── 设置弹层 ── */
+.settings-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(26,25,23,0.35); z-index: 400;
+  align-items: flex-start; justify-content: flex-end;
+}
+.settings-overlay.show { display: flex; }
+.settings-modal {
+  background: var(--paper-card);
+  width: 280px; min-height: 100vh;
+  padding: 32px 24px; position: relative;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+}
+.settings-modal h3 {
+  font-size: 14px; font-weight: 400;
+  letter-spacing: 0.3em; color: var(--ink);
+  margin-bottom: 24px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--line);
+}
+.settings-close {
+  position: absolute; top: 16px; right: 16px;
+  background: none; border: none;
+  font-size: 18px; color: var(--ink-soft); cursor: pointer;
+}
+.settings-section { margin-bottom: 28px; }
+.settings-label {
+  font-size: 11px; color: var(--ink-soft);
+  letter-spacing: 0.2em; margin-bottom: 8px;
+}
+.settings-code {
+  font-size: 15px; color: var(--ink);
+  letter-spacing: 0.1em; padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 10px; word-break: break-all;
+}
+.settings-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.settings-action {
+  font-family: inherit; font-size: 12px;
+  border: 1px solid var(--accent-l); background: none;
+  color: var(--accent); border-radius: 2px;
+  padding: 5px 14px; cursor: pointer;
+  letter-spacing: 0.1em;
+}
+.settings-action:hover { background: var(--accent); color: #f8f7f4; }
+.settings-action.danger {
+  border-color: var(--line); color: var(--ink-soft);
+}
+.settings-input {
+  width: 100%; font-family: inherit; font-size: 13px;
+  border: none; border-bottom: 1px solid var(--line);
+  padding: 6px 0; background: transparent; color: var(--ink);
+  outline: none; margin-bottom: 8px;
+}
+.settings-input:focus { border-color: var(--accent-l); }
+.settings-hint { font-size: 11px; color: var(--ink-soft); line-height: 1.7; }
+
+/* ── 导航 ── */
+nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex;
+  background: rgba(242,240,236,0.96);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line); z-index: 100;
+}
+nav button {
+  flex: 1; background: none; border: none;
+  padding: 13px 0 11px; font-family: inherit;
+  font-size: 13px; color: var(--ink-soft);
+  letter-spacing: 0.25em; cursor: pointer;
+}
+nav button.active {
+  color: var(--accent);
+  border-top: 1.5px solid var(--accent);
+  margin-top: -1px;
+}
+
+/* ── 主区域 ── */
+main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── 卡片 ── */
+.card {
+  background: var(--paper-card);
+  border: 1px solid var(--line); border-radius: 1px;
+  padding: 22px 22px 14px; margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  position: relative;
+}
+.card::after {
+  content: ''; position: absolute;
+  left: 0; top: 20px; bottom: 20px;
+  width: 2px; background: var(--line);
+}
+.card.word::after { background: var(--accent-dim); }
+.card .content {
+  font-size: 18px; white-space: pre-wrap;
+  word-break: break-word; line-height: 2.1; color: var(--ink);
+}
+.card.word .content { font-size: 18px; letter-spacing: 0.05em; }
+.card .note {
+  margin-top: 10px; font-size: 13px; color: var(--ink-soft);
+  white-space: pre-wrap; line-height: 1.85;
+  padding-left: 12px; border-left: 1px solid var(--line);
+}
+.card .source {
+  margin-top: 8px; font-size: 12px;
+  color: var(--accent); text-align: right; letter-spacing: 0.06em;
+}
+.card .tags { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+.card .tag {
+  font-size: 11px; color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  border-radius: 20px; padding: 1px 10px; cursor: pointer;
+}
+
+/* ── 操作栏 ── */
+.card .actions {
+  margin-top: 14px; display: flex;
+  border-top: 1px solid var(--line);
+  padding-top: 10px; align-items: center;
+}
+.card .actions span {
+  font-size: 12px; color: var(--ink-soft);
+  letter-spacing: 0.12em; cursor: pointer; padding-right: 14px;
+}
+.card .actions span:hover { color: var(--accent); }
+.card .actions span.active-action { color: var(--accent); }
+.card .actions .right { margin-left: auto; display: flex; gap: 14px; }
+.card .actions .right span { padding-right: 0; font-size: 11px; }
+
+/* ── 听按钮 ── */
+.listen-area { margin-top: 10px; }
+.listen-btn {
+  font-family: inherit; font-size: 11px;
+  border: 1px solid var(--line); background: none;
+  color: var(--ink-soft); border-radius: 20px;
+  padding: 2px 14px; cursor: pointer; letter-spacing: 0.15em;
+}
+.listen-btn.speaking { border-color: var(--accent); color: var(--accent); }
+
+/* ── 标签编辑 ── */
+.tag-edit-panel { display: none; margin-top: 10px; }
+.tag-edit-panel.show { display: flex; gap: 8px; align-items: center; }
+.tag-edit-panel input {
+  flex: 1; font-family: inherit; font-size: 12px;
+  border: none; border-bottom: 1px solid var(--line);
+  padding: 3px 0; background: transparent; color: var(--ink); outline: none;
+}
+.tag-edit-panel button {
+  font-family: inherit; font-size: 12px;
+  border: 1px solid var(--accent-l); background: none;
+  color: var(--accent); border-radius: 2px; padding: 3px 10px; cursor: pointer;
+}
+
+/* ── 综合面板 ── */
+.combined-panel {
+  display: none; margin-top: 14px;
+  border-top: 1px solid var(--line); padding-top: 14px;
+}
+.combined-panel.show { display: block; }
+.ety-content {
+  font-size: 13.5px; color: #2a3540;
+  line-height: 2.1; white-space: pre-wrap;
+  word-break: break-word;
+}
+.ety-content.loading { color: var(--ink-soft); font-style: italic; font-size: 13px; }
+.ety-footer {
+  text-align: right; margin-top: 6px;
+  display: flex; justify-content: flex-end; gap: 14px;
+}
+.regen-btn, .edit-ety-btn {
+  font-size: 11px; color: var(--ink-soft); cursor: pointer;
+  letter-spacing: 0.1em; border-bottom: 1px dotted var(--ink-soft);
+}
+.verify-link {
+  font-size: 11px; color: var(--accent);
+  letter-spacing: 0.1em; text-decoration: none;
+  border-bottom: 1px dotted var(--accent);
+  margin-right: auto;
+}
+
+
+.panel-textarea {
+  width: 100%; font-family: inherit; font-size: 13px;
+  border: none; border-bottom: 1px solid var(--line);
+  padding: 6px 0; background: transparent; color: var(--ink);
+  resize: none; line-height: 1.8; outline: none;
+}
+.panel-textarea:focus { border-color: var(--accent-l); }
+.panel-textarea::placeholder { color: var(--ink-soft); font-size: 12px; }
+.panel-submit {
+  margin-top: 8px; font-family: inherit; font-size: 12px;
+  border: 1px solid var(--accent-l); background: none;
+  color: var(--accent); border-radius: 2px;
+  padding: 4px 16px; cursor: pointer; letter-spacing: 0.15em;
+}
+.ask-answer {
+  margin-top: 10px; font-size: 13.5px; color: var(--ink-mid);
+  line-height: 1.95; white-space: pre-wrap;
+  padding-left: 10px; border-left: 2px solid var(--accent-dim);
+}
+.ask-answer a {
+  display: inline-block; margin-top: 6px;
+  font-size: 12px; color: var(--accent); text-decoration: none;
+}
+.sub-actions {
+  display: flex; gap: 20px;
+  margin-top: 16px; padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.sub-actions span {
+  font-size: 12px; color: var(--ink-soft);
+  letter-spacing: 0.2em; cursor: pointer;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+}
+.sub-actions span:hover { color: var(--accent); }
+.sub-actions span.active-action {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.sub-panel {
+  display: none; margin-top: 12px;
+}
+.sub-panel.open { display: block; }
+.ask-section.sub-panel.open {
+  background: #eef3f6;
+  border-radius: 2px;
+  padding: 12px 14px;
+  margin-left: -14px; margin-right: -14px;
+}
+.notes-section.sub-panel.open {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.panel-discard {
+  font-family: inherit; font-size: 12px;
+  border: none; background: none;
+  color: var(--ink-soft); cursor: pointer;
+  letter-spacing: 0.15em; padding: 4px 0;
+}
+.panel-discard:hover { color: var(--ink); }
+.save-to-note-btn {
+  display: inline-block; margin-top: 8px;
+  font-family: inherit; font-size: 11px;
+  border: 1px solid var(--accent-dim); background: none;
+  color: var(--accent); border-radius: 2px;
+  padding: 3px 10px; cursor: pointer; letter-spacing: 0.1em;
+}
+.save-to-note-btn:disabled { color: var(--ink-soft); border-color: var(--line); cursor: default; }
+.notes-list { margin-bottom: 8px; }
+.note-item {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 10px; padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px; color: var(--ink-mid); line-height: 1.8;
+}
+.note-item:last-child { border-bottom: none; }
+.note-del { font-size: 11px; color: var(--line); cursor: pointer; flex-shrink: 0; }
+.note-del:hover { color: var(--ink-soft); }
+
+/* ── 邂逅 ── */
+.refresh-btn {
+  display: block; margin: 4px auto 20px;
+  background: none; border: 1px solid var(--line);
+  color: var(--ink-soft); border-radius: 20px;
+  padding: 6px 28px; font-family: inherit;
+  font-size: 12px; letter-spacing: 0.3em; cursor: pointer;
+}
+.refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── 藏书 ── */
+.shelf-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+.shelf-bar input {
+  flex: 1; font-family: inherit; font-size: 14px;
+  padding: 8px 0; border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent; color: var(--ink); outline: none;
+}
+.shelf-bar input:focus { border-color: var(--accent-l); }
+.shelf-bar input::placeholder { color: var(--ink-soft); font-size: 13px; }
+.shelf-bar select {
+  font-family: inherit; font-size: 12px;
+  border: 1px solid var(--line); border-radius: 2px;
+  background: transparent; color: var(--ink-soft); padding: 4px 6px;
+}
+.shelf-bar button {
+  font-family: inherit; font-size: 12px;
+  border: 1px solid var(--accent-l); border-radius: 2px;
+  background: none; color: var(--accent);
+  padding: 4px 14px; cursor: pointer; letter-spacing: 0.15em;
+}
+.shelf-pagination {
+  display: flex; justify-content: center; align-items: center;
+  gap: 16px; margin-top: 20px;
+  font-size: 12px; color: var(--ink-soft); letter-spacing: 0.1em;
+}
+.shelf-pagination span { cursor: pointer; }
+.shelf-pagination span:hover { color: var(--accent); }
+.shelf-pagination .page-info { cursor: default; }
+
+/* ── 录入 ── */
+.import-hint { font-size: 12px; color: var(--ink-soft); margin-bottom: 12px; line-height: 1.8; }
+textarea#importText {
+  width: 100%; height: 200px; font-family: inherit; font-size: 14px;
+  padding: 14px; line-height: 2; border: 1px solid var(--line);
+  border-radius: 1px; background: var(--paper-card); color: var(--ink);
+  resize: vertical; outline: none;
+}
+textarea#importText:focus { border-color: var(--accent-l); }
+.primary-btn {
+  margin-top: 12px; background: var(--accent); color: #f8f7f4;
+  border: none; border-radius: 2px; padding: 10px 24px;
+  font-family: inherit; font-size: 13px; letter-spacing: 0.25em; cursor: pointer;
+}
+
+/* ── 寻句悬浮 ── */
+.seek-fab {
+  position: fixed; bottom: 88px; right: 20px;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--accent); color: #f8f7f4;
+  border: none; font-family: inherit; font-size: 13px;
+  letter-spacing: 0.05em; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  z-index: 200;
+}
+.seek-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(26,25,23,0.35); z-index: 300;
+  align-items: flex-end; justify-content: center;
+}
+.seek-overlay.show { display: flex; }
+.seek-modal {
+  background: var(--paper-card); border-radius: 6px 6px 0 0;
+  padding: 24px 20px 36px; width: 100%; max-width: 600px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+}
+.seek-modal h3 { font-size: 15px; font-weight: 400; letter-spacing: 0.3em; margin-bottom: 6px; }
+.seek-hint { font-size: 12px; color: var(--ink-soft); margin-bottom: 14px; }
+.seek-modal textarea {
+  width: 100%; font-family: inherit; font-size: 14px;
+  border: none; border-bottom: 1px solid var(--line);
+  padding: 6px 0; background: transparent; color: var(--ink);
+  resize: none; line-height: 1.85; outline: none;
+}
+.seek-modal-actions { margin-top: 12px; display: flex; gap: 10px; align-items: center; }
+.seek-submit {
+  font-family: inherit; font-size: 13px;
+  border: 1px solid var(--accent-l); background: none;
+  color: var(--accent); border-radius: 2px;
+  padding: 6px 20px; cursor: pointer; letter-spacing: 0.15em;
+}
+.seek-close {
+  font-family: inherit; font-size: 12px;
+  border: none; background: none; color: var(--ink-soft);
+  cursor: pointer; letter-spacing: 0.1em; margin-left: auto;
+}
+.seek-results { margin-top: 16px; }
+.seek-result-item {
+  padding: 12px 0; border-bottom: 1px solid var(--line);
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.seek-result-item:last-child { border-bottom: none; }
+.seek-result-text { flex: 1; font-size: 14px; color: var(--ink); line-height: 1.9; }
+.seek-result-source { font-size: 11px; color: var(--accent); margin-top: 3px; }
+.seek-adopt {
+  font-family: inherit; font-size: 11px;
+  border: 1px solid var(--accent-dim); background: none;
+  color: var(--accent); border-radius: 2px;
+  padding: 3px 10px; cursor: pointer; flex-shrink: 0; margin-top: 2px;
+}
+
+.empty { text-align: center; color: var(--ink-soft); font-size: 13px; padding: 40px 0; letter-spacing: 0.1em; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>拾遗</h1>
+  <div class="sub">古语 · 旧句 · 私藏</div>
+  <button class="settings-btn" onclick="openSettings()" title="设置">置</button>
+</header>
+
+<main>
+  <div class="view active" id="view-home">
+    <button class="refresh-btn" onclick="loadRandom()">再看几条</button>
+    <div id="home-list"></div>
+  </div>
+
+  <div class="view" id="view-shelf">
+    <div class="shelf-bar">
+      <input type="text" id="shelfSearch" placeholder="搜词句、意思、标记……">
+      <select id="shelfMode">
+        <option value="keyword">关键词</option>
+        <option value="semantic">意思</option>
+      </select>
+      <button onclick="doShelfSearch()">寻</button>
+    </div>
+    <div id="shelf-list"></div>
+    <div class="shelf-pagination" id="shelf-pagination"></div>
+  </div>
+
+  <div class="view" id="view-import">
+    <p class="import-hint">把摘抄的文本整段粘贴进来，系统只做切分整理，不会自动添加解释。</p>
+    <textarea id="importText" placeholder="粘贴一段或多段摘抄……"></textarea>
+    <button class="primary-btn" onclick="doImport()">整理入库</button>
+    <div id="import-result"></div>
+  </div>
+</main>
+
+<nav>
+  <button class="active" data-view="home" onclick="switchView('home')">邂逅</button>
+  <button data-view="shelf" onclick="switchView('shelf')">藏书</button>
+  <button data-view="import" onclick="switchView('import')">录入</button>
+</nav>
+
+<button class="seek-fab" onclick="openSeek()">寻</button>
+
+<!-- 设置面板 -->
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsIfBg(event)">
+  <div class="settings-modal">
+    <button class="settings-close" onclick="closeSettings()">×</button>
+    <h3>设　置</h3>
+
+    <div class="settings-section">
+      <div class="settings-label">同步码</div>
+      <div class="settings-code" id="currentCode"></div>
+      <div class="settings-row">
+        <button class="settings-action" onclick="copyCode()">复制</button>
+        <button class="settings-action" onclick="showSwitchCode()">切换</button>
+      </div>
+      <div id="switchCodeArea" style="display:none;margin-top:12px;">
+        <input class="settings-input" id="newCodeInput" placeholder="输入同步码">
+        <div class="settings-row">
+          <button class="settings-action" onclick="doSwitchCode()">确认切换</button>
+          <button class="settings-action danger" onclick="hideSwitchCode()">取消</button>
+        </div>
+      </div>
+      <p class="settings-hint" style="margin-top:10px;">把同步码分享给朋友，对方输入后即可共用同一词库。不同的码完全隔离。</p>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-label">数据</div>
+      <div class="settings-row">
+        <button class="settings-action" onclick="doExport()">导出备份</button>
+      </div>
+      <p class="settings-hint" style="margin-top:8px;">导出为 txt 文件保存到本地。</p>
+    </div>
+  </div>
+</div>
+
+<!-- 寻句面板 -->
+<div class="seek-overlay" id="seekOverlay" onclick="closeSeekIfBg(event)">
+  <div class="seek-modal">
+    <h3>寻句</h3>
+    <p class="seek-hint">描述你记得的意思或感觉，AI帮你找到可能是哪句诗词</p>
+    <textarea id="seekInput" rows="3" placeholder="例如：形容久别重逢却已物是人非的那种感觉……"></textarea>
+    <div class="seek-modal-actions">
+      <button class="seek-submit" onclick="doSeek()">寻</button>
+      <button class="seek-close" onclick="closeSeek()">关闭</button>
+    </div>
+    <div class="seek-results" id="seekResults"></div>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'https://shici-vault.demi89612.workers.dev';
+let shelfOffset = 0;
+const SHELF_LIMIT = 20;
+let shelfTotal = 0;
+let currentSpeakBtn = null;
+
+// ── 同步码 ──
+function getCode() {
+  let code = localStorage.getItem('shici_user_code');
+  if (!code) {
+    code = Math.random().toString(36).slice(2,8) + Math.random().toString(36).slice(2,8);
+    localStorage.setItem('shici_user_code', code);
+  }
+  return code;
+}
+
+// ── 设置面板 ──
+function openSettings() {
+  document.getElementById('currentCode').textContent = getCode();
+  document.getElementById('settingsOverlay').classList.add('show');
+}
+function closeSettings() {
+  document.getElementById('settingsOverlay').classList.remove('show');
+  hideSwitchCode();
+}
+function closeSettingsIfBg(e) {
+  if (e.target === document.getElementById('settingsOverlay')) closeSettings();
+}
+function copyCode() {
+  navigator.clipboard.writeText(getCode()).then(() => alert('同步码已复制'));
+}
+function showSwitchCode() {
+  document.getElementById('switchCodeArea').style.display = 'block';
+  document.getElementById('newCodeInput').focus();
+}
+function hideSwitchCode() {
+  document.getElementById('switchCodeArea').style.display = 'none';
+  document.getElementById('newCodeInput').value = '';
+}
+function doSwitchCode() {
+  const newCode = document.getElementById('newCodeInput').value.trim();
+  if (!newCode) return;
+  localStorage.setItem('shici_user_code', newCode);
+  closeSettings();
+  location.reload();
+}
+
+// ── API ──
+async function api(path, opts = {}) {
+  const code = getCode();
+  let fullPath = path;
+  if (!opts.method || opts.method === 'GET') {
+    const sep = path.includes('?') ? '&' : '?';
+    fullPath = path + sep + 'code=' + encodeURIComponent(code);
+  }
+  if (opts.body && (opts.method === 'POST' || opts.method === 'PUT')) {
+    try {
+      const body = JSON.parse(opts.body);
+      body.code = code;
+      opts = { ...opts, body: JSON.stringify(body) };
+    } catch(e) {}
+  }
+  const res = await fetch(API_BASE + fullPath, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  return res.json();
+}
+
+function escapeHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function parseTags(str) {
+  if (!str||!str.trim()) return [];
+  return str.trim().split(/\s+/).filter(Boolean);
+}
+
+// ── 视图切换 ──
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelector(`nav button[data-view="${name}"]`).classList.add('active');
+  if (name==='home' && !document.getElementById('home-list').children.length) loadRandom();
+  if (name==='shelf' && !document.getElementById('shelf-list').children.length) loadShelf();
+}
+
+// ── 卡片渲染 ──
+function renderCard(entry, showListen=false) {
+  const div = document.createElement('div');
+  div.className = 'card ' + entry.type;
+  div.dataset.id = entry.id;
+
+  let html = `<div class="content">${escapeHtml(entry.content)}</div>`;
+  if (entry.note) html += `<div class="note">${escapeHtml(entry.note)}</div>`;
+  if (entry.source) html += `<div class="source">${escapeHtml(entry.source)}</div>`;
+
+  const tagList = parseTags(entry.tags);
+  if (tagList.length>0) {
+    html += `<div class="tags">${tagList.map(t=>`<span class="tag" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`).join('')}</div>`;
+  }
+  if (showListen) html += `<div class="listen-area"><button class="listen-btn">听</button></div>`;
+
+  html += `<div class="actions">
+    <span class="ety-toggle" onclick="toggleCombined(this)">溯源</span>
+    <span onclick="toggleTagEdit(this)">标记</span>
+    <div class="right">
+      <span onclick="editEntry(${entry.id},this)">改</span>
+      <span onclick="deleteEntry(${entry.id},this)">删</span>
+    </div>
+  </div>`;
+
+  html += `<div class="tag-edit-panel">
+    <input type="text" placeholder="空格分隔多个标记" value="${escapeHtml(entry.tags||'')}">
+    <button onclick="saveTags(${entry.id},this)">存</button>
+  </div>`;
+
+  html += `<div class="combined-panel">
+    <div class="ety-content loading">查证中……</div>
+    <div class="ety-footer">
+      <span class="regen-btn" onclick="regenEtymology(this)">重新生成</span>
+      <span class="edit-ety-btn" onclick="editEtymology(this)">编辑</span>
+    </div>
+    <div class="sub-actions">
+      <span onclick="toggleSubPanel(this,'ask-section')">试问</span>
+      <span onclick="toggleSubPanel(this,'notes-section')">笔记</span>
+    </div>
+    <div class="ask-section sub-panel">
+      <textarea class="panel-textarea" rows="2" placeholder="想问什么？留空则给出一般解读"></textarea>
+      <button class="panel-submit" onclick="doAsk(${entry.id},this)">问</button>
+      <div class="ask-answer"></div>
+    </div>
+    <div class="notes-section sub-panel">
+      <div class="notes-list"></div>
+      <textarea class="panel-textarea" rows="2" placeholder="记下感想、摘录好句……"></textarea>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button class="panel-submit" onclick="addNote(${entry.id},this)">存</button>
+        <button class="panel-discard" onclick="this.closest('.notes-section').querySelector('textarea').value=''">弃</button>
+      </div>
+    </div>
+  </div>`;
+
+  div.innerHTML = html;
+
+  if (showListen) {
+    const btn = div.querySelector('.listen-btn');
+    btn.addEventListener('click', () => {
+      if (currentSpeakBtn && currentSpeakBtn!==btn) {
+        speechSynthesis.cancel();
+        currentSpeakBtn.textContent='听';
+        currentSpeakBtn.classList.remove('speaking');
+      }
+      if (btn.classList.contains('speaking')) {
+        speechSynthesis.cancel();
+        btn.textContent='听'; btn.classList.remove('speaking'); currentSpeakBtn=null;
+      } else { speak(entry.content, btn); }
+    });
+  }
+  return div;
+}
+
+function toggleCombined(btn) {
+  const card = btn.closest('.card');
+  const panel = card.querySelector('.combined-panel');
+  const show = !panel.classList.contains('show');
+  panel.classList.toggle('show', show);
+  btn.classList.toggle('active-action', show);
+  if (show && !panel.dataset.etyLoaded) loadEtymology(card);
+}
+
+
+
+async function loadEtymology(card, force=false) {
+  const panel = card.querySelector('.combined-panel');
+  panel.dataset.etyLoaded = '1';
+  const div = card.querySelector('.ety-content');
+  if (force) { div.classList.add('loading'); div.textContent='重新生成中……'; }
+  const data = await api('/api/etymology', { method:'POST', body: JSON.stringify({ id: parseInt(card.dataset.id), force }) });
+  div.classList.remove('loading');
+  div.textContent = data.content || data.error || '未能查到';
+
+}
+
+function regenEtymology(btn) { loadEtymology(btn.closest('.card'), true); }
+
+function editEtymology(btn) {
+  const card = btn.closest('.card');
+  const div = card.querySelector('.ety-content');
+  const current = div.textContent;
+  // 变成textarea
+  const ta = document.createElement('textarea');
+  ta.className = 'panel-textarea ety-edit-area';
+  ta.style.cssText = 'min-height:120px;margin-bottom:8px;';
+  ta.value = current;
+  div.replaceWith(ta);
+  ta.focus();
+  // 按钮变成"存"
+  btn.textContent = '存';
+  btn.onclick = () => saveEtymology(btn);
+}
+
+async function saveEtymology(btn) {
+  const card = btn.closest('.card');
+  const ta = card.querySelector('.ety-edit-area');
+  const newContent = ta.value.trim();
+  // 恢复显示
+  const div = document.createElement('div');
+  div.className = 'ety-content';
+  div.textContent = newContent;
+  ta.replaceWith(div);
+  // 存回缓存
+  await api('/api/etymology/save', { method: 'POST', body: JSON.stringify({ id: parseInt(card.dataset.id), content: newContent }) });
+  // 按钮恢复
+  btn.textContent = '编辑';
+  btn.onclick = () => editEtymology(btn);
+}
+
+function toggleSubPanel(btn, panelClass) {
+  const combined = btn.closest('.combined-panel');
+  const panel = combined.querySelector('.' + panelClass);
+  const isOpen = panel.classList.contains('open');
+  // 收起再展开（两个可以同时展开）
+  panel.classList.toggle('open', !isOpen);
+  btn.classList.toggle('active-action', !isOpen);
+  if (!isOpen && panelClass === 'notes-section') {
+    const card = btn.closest('.card');
+    if (!combined.dataset.notesLoaded) loadNotes(card);
+  }
+}
+
+async function doAsk(id, btn) {
+  const section = btn.closest('.ask-section');
+  const answerDiv = section.querySelector('.ask-answer');
+  answerDiv.textContent = '寻思中……';
+  const data = await api('/api/ask', { method:'POST', body: JSON.stringify({ id, question: section.querySelector('textarea').value }) });
+  const answer = data.content || data.error || '暂无回应';
+  answerDiv.textContent = answer;
+  // 存入笔记按钮
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'save-to-note-btn';
+  saveBtn.textContent = '存入笔记';
+  saveBtn.onclick = () => {
+    const card = saveBtn.closest('.card');
+    const noteTextarea = card.querySelector('.notes-section textarea');
+    noteTextarea.value = answer;
+    noteTextarea.focus();
+    saveBtn.textContent = '已填入笔记框';
+    saveBtn.disabled = true;
+  };
+  answerDiv.appendChild(saveBtn);
+  const m = answer.match(/《([^》]+)》/);
+  if (m) {
+    const a = document.createElement('a');
+    a.href=`https://www.gushiwen.cn/search.aspx?value=${encodeURIComponent(m[1])}`;
+    a.target='_blank'; a.textContent=`查全诗：《${m[1]}》→`;
+    answerDiv.appendChild(a);
+  }
+}
+
+async function loadNotes(card) {
+  const panel = card.querySelector('.combined-panel');
+  panel.dataset.notesLoaded = '1';
+  const data = await api(`/api/entry/${card.dataset.id}/notes`);
+  const list = card.querySelector('.notes-list');
+  list.innerHTML = '';
+  (data.notes||[]).forEach(n=>renderNoteItem(list,n));
+}
+
+function renderNoteItem(list, note) {
+  const div = document.createElement('div');
+  div.className = 'note-item';
+  div.innerHTML = `<span>${escapeHtml(note.content)}</span><span class="note-del" onclick="deleteNote(${note.id},this)">删</span>`;
+  list.appendChild(div);
+}
+
+async function addNote(entryId, btn) {
+  const section = btn.closest('.notes-section');
+  const textarea = section.querySelector('textarea');
+  const content = textarea.value.trim();
+  if (!content) return;
+  const data = await api(`/api/entry/${entryId}/notes`, { method:'POST', body: JSON.stringify({ content }) });
+  if (data.id) { renderNoteItem(section.querySelector('.notes-list'), data); textarea.value=''; }
+}
+
+async function deleteNote(noteId, btn) {
+  if (!confirm('删除这条笔记？')) return;
+  await api(`/api/note/${noteId}`, { method:'DELETE' });
+  btn.closest('.note-item').remove();
+}
+
+function toggleTagEdit(btn) {
+  btn.closest('.card').querySelector('.tag-edit-panel').classList.toggle('show');
+}
+
+async function saveTags(id, btn) {
+  const input = btn.previousElementSibling;
+  const tags = input.value.trim();
+  await api(`/api/entry/${id}`, { method:'PUT', body: JSON.stringify({ tags }) });
+  const card = btn.closest('.card');
+  card.querySelector('.tag-edit-panel').classList.remove('show');
+  let tagDiv = card.querySelector('.tags');
+  const tagList = parseTags(tags);
+  if (tagList.length>0) {
+    if (!tagDiv) {
+      tagDiv = document.createElement('div'); tagDiv.className='tags';
+      (card.querySelector('.source')||card.querySelector('.note')||card.querySelector('.content')).insertAdjacentElement('afterend',tagDiv);
+    }
+    tagDiv.innerHTML = tagList.map(t=>`<span class="tag" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`).join('');
+  } else if (tagDiv) tagDiv.remove();
+}
+
+function filterByTag(tag) {
+  switchView('shelf');
+  document.getElementById('shelfSearch').value = tag;
+  shelfOffset=0; loadShelf({q:tag,mode:'keyword'});
+}
+
+async function editEntry(id, btn) {
+  const card = btn.closest('.card');
+  const contentDiv = card.querySelector('.content');
+  const updated = prompt('编辑内容：', contentDiv.textContent);
+  if (updated===null||updated===contentDiv.textContent) return;
+  await api(`/api/entry/${id}`, { method:'PUT', body: JSON.stringify({ content: updated }) });
+  contentDiv.textContent = updated;
+}
+
+async function deleteEntry(id, btn) {
+  if (!confirm('确定删除这一条？')) return;
+  await api(`/api/entry/${id}`, { method:'DELETE' });
+  btn.closest('.card').remove();
+}
+
+function pickBestVoice() {
+  const voices = speechSynthesis.getVoices();
+  const cantoneseKeys = ['善宜', 'sin-ji', 'sinji', 'enhanced'];
+  for (const k of cantoneseKeys) {
+    const v = voices.find(v=>v.name.toLowerCase().includes(k)&&(v.lang==='zh-HK'||v.lang==='yue'));
+    if (v) return v;
+  }
+  return voices.find(v=>v.lang==='zh-HK'||v.lang==='yue-HK')
+      || voices.find(v=>v.lang.startsWith('zh'))
+      || voices[0];
+}
+
+function speak(text, btn) {
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang='zh-HK'; utter.rate=0.72;
+  const voice = pickBestVoice();
+  if (voice) utter.voice = voice;
+  utter.onstart = ()=>{ if(btn){btn.textContent='停';btn.classList.add('speaking');currentSpeakBtn=btn;} };
+  utter.onend = utter.onerror = ()=>{ if(btn){btn.textContent='听';btn.classList.remove('speaking');} currentSpeakBtn=null; };
+  speechSynthesis.speak(utter);
+}
+
+async function loadRandom() {
+  const list = document.getElementById('home-list');
+  list.innerHTML = '<div class="empty">翻阅中……</div>';
+  const data = await api('/api/random?n=8');
+  list.innerHTML = '';
+  if (!data.entries||data.entries.length===0) {
+    list.innerHTML='<div class="empty">库里还空着，去「录入」添加一些吧</div>'; return;
+  }
+  data.entries.forEach(e=>list.appendChild(renderCard(e,true)));
+}
+
+async function loadShelf(opts={}) {
+  const list = document.getElementById('shelf-list');
+  list.innerHTML = '<div class="empty">翻阅中……</div>';
+  const q = opts.q!==undefined ? opts.q : document.getElementById('shelfSearch').value.trim();
+  const mode = opts.mode||document.getElementById('shelfMode').value;
+  let data;
+  if (q) {
+    if (mode==='semantic') {
+      data = await api('/api/semantic',{method:'POST',body:JSON.stringify({query:q,n:20})});
+    } else {
+      data = await api(`/api/search?q=${encodeURIComponent(q)}`);
+    }
+    data.total = (data.entries||[]).length;
+  } else {
+    data = await api(`/api/entries?limit=${SHELF_LIMIT}&offset=${shelfOffset}`);
+  }
+  list.innerHTML='';
+  shelfTotal = data.total||0;
+  if (!data.entries||data.entries.length===0) {
+    list.innerHTML='<div class="empty">没有找到相符的</div>';
+    renderPagination(q); return;
+  }
+  data.entries.forEach(e=>list.appendChild(renderCard(e,true)));
+  renderPagination(q);
+}
+
+function renderPagination(q) {
+  const pg = document.getElementById('shelf-pagination');
+  if (q) { pg.innerHTML=''; return; }
+  const totalPages = Math.ceil(shelfTotal/SHELF_LIMIT);
+  const currentPage = Math.floor(shelfOffset/SHELF_LIMIT)+1;
+  pg.innerHTML='';
+  if (shelfOffset>0) {
+    const prev=document.createElement('span');
+    prev.textContent='← 前页';
+    prev.onclick=()=>{shelfOffset-=SHELF_LIMIT;loadShelf();};
+    pg.appendChild(prev);
+  }
+  const info=document.createElement('span');
+  info.className='page-info';
+  info.textContent=`${currentPage} / ${totalPages||1}（共 ${shelfTotal} 条）`;
+  pg.appendChild(info);
+  if (shelfOffset+SHELF_LIMIT<shelfTotal) {
+    const next=document.createElement('span');
+    next.textContent='后页 →';
+    next.onclick=()=>{shelfOffset+=SHELF_LIMIT;loadShelf();};
+    pg.appendChild(next);
+  }
+}
+
+async function doShelfSearch() { shelfOffset=0; loadShelf(); }
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('shelfSearch').addEventListener('keydown',e=>{
+    if(e.key==='Enter') doShelfSearch();
+  });
+});
+
+async function doExport() {
+  const data = await api('/api/export');
+  if (!data.entries||data.entries.length===0) { alert('词库为空'); return; }
+  const lines = data.entries.map(e=>{
+    let s=e.content;
+    if(e.source) s+=`\n——${e.source}`;
+    if(e.note) s+=`\n［${e.note}］`;
+    if(e.tags) s+=`\n#${parseTags(e.tags).join(' #')}`;
+    return s;
+  });
+  const blob=new Blob([lines.join('\n\n───\n\n')],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`拾遗_${new Date().toLocaleDateString('zh-CN')}.txt`;
+  a.click();
+}
+
+
+
+async function doImport() {
+  const text=document.getElementById('importText').value;
+  if(!text.trim()) return;
+  const resultDiv=document.getElementById('import-result');
+  resultDiv.innerHTML='<div class="empty">整理中，请稍候……</div>';
+  const data=await api('/api/import',{method:'POST',body:JSON.stringify({text})});
+  if(data.error){resultDiv.innerHTML=`<div class="empty">出错了：${escapeHtml(data.error)}</div>`;return;}
+  resultDiv.innerHTML=`<p style="font-size:12px;color:var(--ink-soft);margin:12px 0 8px;">已收入 ${data.count} 条</p>`;
+  data.inserted.forEach(e=>resultDiv.appendChild(renderCard(e,true)));
+  document.getElementById('importText').value='';
+}
+
+// ── 寻句 ──
+function openSeek() { document.getElementById('seekOverlay').classList.add('show'); }
+function closeSeek() {
+  document.getElementById('seekOverlay').classList.remove('show');
+  document.getElementById('seekResults').innerHTML='';
+  document.getElementById('seekInput').value='';
+}
+function closeSeekIfBg(e) { if(e.target===document.getElementById('seekOverlay')) closeSeek(); }
+
+async function doSeek() {
+  const q=document.getElementById('seekInput').value.trim();
+  if(!q) return;
+  const results=document.getElementById('seekResults');
+  results.innerHTML='<div class="empty">寻思中……</div>';
+  const data=await api('/api/seek',{method:'POST',body:JSON.stringify({query:q})});
+  results.innerHTML='';
+  if(!data.results||data.results.length===0){
+    results.innerHTML='<div class="empty">未能找到相符的句子</div>'; return;
+  }
+  data.results.forEach(r=>{
+    const div=document.createElement('div');
+    div.className='seek-result-item';
+    div.innerHTML=`
+      <div style="flex:1">
+        <div class="seek-result-text">${escapeHtml(r.verse)}</div>
+        <div class="seek-result-source">${escapeHtml(r.source||'')}${r.reason?' · '+escapeHtml(r.reason):''}</div>
+      </div>
+      <button class="seek-adopt" onclick="adoptVerse('${escapeHtml(r.verse)}','${escapeHtml(r.source||'')}')">收入</button>`;
+    results.appendChild(div);
+  });
+}
+
+function adoptVerse(verse,source) {
+  const importText=document.getElementById('importText');
+  const current=importText.value.trim();
+  const toAdd=source?`${verse}\n${source}`:verse;
+  importText.value=current?current+'\n\n'+toAdd:toAdd;
+  closeSeek(); switchView('import');
+}
+
+loadRandom();
+</script>
+</body>
+</html>
