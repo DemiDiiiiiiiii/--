@@ -921,21 +921,50 @@ function renderPagination(q) {
   const totalPages = Math.ceil(shelfTotal/SHELF_LIMIT);
   const currentPage = Math.floor(shelfOffset/SHELF_LIMIT)+1;
   pg.innerHTML='';
+
   if (shelfOffset>0) {
     const prev=document.createElement('span');
-    prev.textContent='← 前页';
+    prev.textContent='← 前';
     prev.onclick=()=>{shelfOffset-=SHELF_LIMIT;loadShelf();};
     pg.appendChild(prev);
   }
+
   const info=document.createElement('span');
   info.className='page-info';
-  info.textContent=`${currentPage} / ${totalPages||1}（共 ${shelfTotal} 条）`;
+  info.textContent=`${currentPage} / ${totalPages||1}`;
   pg.appendChild(info);
+
   if (shelfOffset+SHELF_LIMIT<shelfTotal) {
     const next=document.createElement('span');
-    next.textContent='后页 →';
+    next.textContent='后 →';
     next.onclick=()=>{shelfOffset+=SHELF_LIMIT;loadShelf();};
     pg.appendChild(next);
+  }
+
+  // 跳页输入框
+  if (totalPages > 2) {
+    const jumpWrap = document.createElement('span');
+    jumpWrap.style.cssText='display:flex;align-items:center;gap:4px;';
+    const input = document.createElement('input');
+    input.type='number';
+    input.min=1;
+    input.max=totalPages;
+    input.placeholder='跳';
+    input.style.cssText='width:40px;font-family:inherit;font-size:12px;border:none;border-bottom:1px solid var(--line);background:transparent;text-align:center;padding:2px 0;outline:none;color:var(--ink);';
+    const goBtn = document.createElement('span');
+    goBtn.textContent='页';
+    goBtn.style.cssText='cursor:pointer;color:var(--accent);border-bottom:1px dotted var(--accent);';
+    goBtn.onclick=()=>{
+      const p = parseInt(input.value);
+      if (p>=1 && p<=totalPages) {
+        shelfOffset=(p-1)*SHELF_LIMIT;
+        loadShelf();
+      }
+    };
+    input.addEventListener('keydown', e=>{ if(e.key==='Enter') goBtn.onclick(); });
+    jumpWrap.appendChild(input);
+    jumpWrap.appendChild(goBtn);
+    pg.appendChild(jumpWrap);
   }
 }
 
