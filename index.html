@@ -147,12 +147,7 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   position: relative;
 }
-.card::after {
-  content: ''; position: absolute;
-  left: 0; top: 20px; bottom: 20px;
-  width: 2px; background: var(--line);
-}
-.card.word::after { background: var(--accent-dim); }
+
 .card .content {
   font-size: 18px; white-space: pre-wrap;
   word-break: break-word; line-height: 2.1; color: var(--ink);
@@ -451,6 +446,13 @@ textarea#importText:focus { border-color: var(--accent-l); }
   padding: 3px 10px; cursor: pointer; flex-shrink: 0; margin-top: 2px;
 }
 
+mark.hl {
+  background: #e8f0e0;
+  color: var(--ink);
+  border-radius: 2px;
+  padding: 0 1px;
+  cursor: pointer;
+}
 .empty { text-align: center; color: var(--ink-soft); font-size: 13px; padding: 40px 0; letter-spacing: 0.1em; }
 
 </style>
@@ -501,6 +503,11 @@ textarea#importText:focus { border-color: var(--accent-l); }
 
 <button class="seek-fab" onclick="openSeek()">寻</button>
 <button class="top-fab" onclick="window.scrollTo({top:0,behavior:'smooth'})" id="topBtn" style="display:none">顶</button>
+
+<!-- 高亮浮层 -->
+<div id="highlightTooltip" style="display:none;position:fixed;z-index:500;background:var(--paper-card);border:1px solid var(--line);border-radius:4px;padding:6px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+  <button onclick="doHighlight()" style="font-family:inherit;font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;letter-spacing:0.15em;">高亮</button>
+</div>
 
 <!-- 设置面板 -->
 <div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsIfBg(event)">
@@ -655,9 +662,12 @@ function renderCard(entry, showListen=false) {
   }
   if (showListen) html += `<div class="listen-area"><button class="listen-btn">听</button></div>`;
 
+  // 查全诗搜索词
+  const searchWord = entry.source ? entry.source.split('·')[1] || entry.content.slice(0,8) : entry.content.slice(0,8);
   html += `<div class="actions">
     <span class="ety-toggle" onclick="toggleCombined(this)">溯源</span>
     <span onclick="toggleTagEdit(this)">标记</span>
+    <a href="https://www.bing.com/search?q=${encodeURIComponent(searchWord + ' 古诗全文')}" target="_blank" style="font-size:12px;color:var(--ink-soft);letter-spacing:0.12em;text-decoration:none;padding-right:14px;">全诗</a>
     <div class="right">
       <span onclick="editEntry(${entry.id},this)">改</span>
       <span onclick="deleteEntry(${entry.id},this)">删</span>
@@ -695,6 +705,9 @@ function renderCard(entry, showListen=false) {
   </div>`;
 
   div.innerHTML = html;
+
+  // 异步加载高亮
+  setTimeout(() => loadHighlights(div), 100);
 
   if (showListen) {
     const btn = div.querySelector('.listen-btn');
@@ -869,13 +882,44 @@ function filterByTag(tag) {
   shelfOffset=0; loadShelf({q:tag,mode:'keyword'});
 }
 
-async function editEntry(id, btn) {
+function editEntry(id, btn) {
   const card = btn.closest('.card');
   const contentDiv = card.querySelector('.content');
-  const updated = prompt('编辑内容：', contentDiv.textContent);
-  if (updated===null||updated===contentDiv.textContent) return;
-  await api(`/api/entry/${id}`, { method:'PUT', body: JSON.stringify({ content: updated }) });
-  contentDiv.textContent = updated;
+  const current = contentDiv.textContent;
+
+  // 创建全屏编辑遮罩
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:var(--paper);z-index:600;display:flex;flex-direction:column;padding:20px 16px;';
+
+  const header = document.createElement('div');
+  header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;';
+  header.innerHTML = `<span style="font-size:13px;color:var(--ink-soft);letter-spacing:0.2em;">编辑</span>
+    <div style="display:flex;gap:14px;">
+      <span id="editCancel" style="font-size:13px;color:var(--ink-soft);cursor:pointer;letter-spacing:0.15em;">取消</span>
+      <span id="editSave" style="font-size:13px;color:var(--accent);cursor:pointer;letter-spacing:0.15em;border-bottom:1px solid var(--accent);">存</span>
+    </div>`;
+
+  const ta = document.createElement('textarea');
+  ta.value = current;
+  ta.style.cssText = 'flex:1;font-family:inherit;font-size:17px;line-height:2;border:none;background:transparent;resize:none;outline:none;color:var(--ink);width:100%;';
+
+  overlay.appendChild(header);
+  overlay.appendChild(ta);
+  document.body.appendChild(overlay);
+  ta.focus();
+
+  // 光标移到末尾
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+
+  header.querySelector('#editCancel').onclick = () => overlay.remove();
+  header.querySelector('#editSave').onclick = async () => {
+    const updated = ta.value.trim();
+    if (updated && updated !== current) {
+      await api(`/api/entry/${id}`, { method:'PUT', body: JSON.stringify({ content: updated }) });
+      contentDiv.textContent = updated;
+    }
+    overlay.remove();
+  };
 }
 
 async function deleteEntry(id, btn) {
@@ -1074,6 +1118,80 @@ async function doImport() {
     resultDiv.appendChild(dupDiv);
   }
   document.getElementById('importText').value = '';
+}
+
+// ── 高亮 ──
+let _highlightEntryId = null;
+let _highlightText = null;
+
+document.addEventListener('selectionchange', () => {
+  const sel = window.getSelection();
+  const tooltip = document.getElementById('highlightTooltip');
+  if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+    tooltip.style.display = 'none';
+    return;
+  }
+  const text = sel.toString().trim();
+  if (text.length < 2) return;
+
+  // 找到最近的卡片
+  const range = sel.getRangeAt(0);
+  const card = range.commonAncestorContainer.nodeType === 1
+    ? range.commonAncestorContainer.closest('.card')
+    : range.commonAncestorContainer.parentElement?.closest('.card');
+  if (!card) { tooltip.style.display = 'none'; return; }
+
+  _highlightEntryId = parseInt(card.dataset.id);
+  _highlightText = text;
+
+  // 定位浮层到选中文字附近
+  const rect = range.getBoundingClientRect();
+  tooltip.style.display = 'block';
+  tooltip.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+  tooltip.style.left = Math.max(10, rect.left + window.scrollX) + 'px';
+});
+
+async function doHighlight() {
+  if (!_highlightEntryId || !_highlightText) return;
+  const tooltip = document.getElementById('highlightTooltip');
+  tooltip.style.display = 'none';
+
+  const data = await api(`/api/entry/${_highlightEntryId}/highlights`, {
+    method: 'POST',
+    body: JSON.stringify({ text: _highlightText })
+  });
+
+  if (data.id) {
+    // 在卡片里显示高亮
+    const card = document.querySelector(`.card[data-id="${_highlightEntryId}"]`);
+    if (card) applyHighlightToCard(card, _highlightText, data.id);
+  }
+  window.getSelection()?.removeAllRanges();
+}
+
+function applyHighlightToCard(card, text, hlId) {
+  const contentDiv = card.querySelector('.content');
+  if (!contentDiv) return;
+  const escaped = text.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
+  contentDiv.innerHTML = contentDiv.innerHTML.replace(
+    new RegExp(escaped, 'g'),
+    `<mark class="hl" data-hl-id="${hlId}" onclick="removeHighlight(${hlId},this)">${text}</mark>`
+  );
+}
+
+async function removeHighlight(hlId, el) {
+  if (!confirm('取消高亮？')) return;
+  await api(`/api/highlight/${hlId}`, { method: 'DELETE' });
+  // 恢复纯文本
+  el.replaceWith(document.createTextNode(el.textContent));
+}
+
+async function loadHighlights(card) {
+  const id = card.dataset.id;
+  const data = await api(`/api/entry/${id}/highlights`);
+  if (data.highlights && data.highlights.length > 0) {
+    data.highlights.forEach(hl => applyHighlightToCard(card, hl.text, hl.id));
+  }
 }
 
 // ── 寻句 ──
