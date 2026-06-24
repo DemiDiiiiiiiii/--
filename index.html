@@ -143,9 +143,8 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
 .card {
   background: var(--paper-card);
   border: 1px solid var(--line); border-radius: 1px;
-  padding: 22px 22px 14px; margin-bottom: 16px;
+  padding: 20px 18px 14px; margin-bottom: 16px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  position: relative;
 }
 
 .card .content {
@@ -163,12 +162,13 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   margin-top: 8px; font-size: 12px;
   color: var(--accent); text-align: right; letter-spacing: 0.06em;
 }
-.card .tags { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+.card .tags { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 .card .tag {
-  font-size: 11px; color: var(--accent);
-  border: 1px solid var(--accent-dim);
-  border-radius: 20px; padding: 1px 10px; cursor: pointer;
+  font-size: 11px; color: var(--ink-soft);
+  letter-spacing: 0.1em; cursor: pointer;
+  padding: 0;
 }
+.card .tag:hover { color: var(--accent); }
 
 /* ── 操作栏 ── */
 .card .actions {
