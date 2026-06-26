@@ -499,19 +499,24 @@ mark.hl {
   </div>
 
   <div class="view" id="view-shelf">
-    <div class="topic-tags">
-      <span onclick="filterByTag('元白')">元白</span>
+
+    <div class="shelf-topics">
+      <span class="topic-item" onclick="filterByTag('元白')">元白</span>
+      <span class="topic-item" onclick="showAllHighlights()">高亮</span>
+      <span class="topic-clear" id="filterClear" style="display:none" onclick="clearFilter()">清除</span>
     </div>
-    <div class="shelf-bar">
+
+    <div class="shelf-search-box">
       <input type="text" id="shelfSearch" placeholder="搜词句、意思、标记……">
-      <select id="shelfMode">
-        <option value="keyword">关键词</option>
-        <option value="semantic">意思</option>
-      </select>
-      <button onclick="doShelfSearch()">寻</button>
+      <div class="shelf-search-actions">
+        <span id="shelfModeToggle" onclick="toggleShelfMode()">关键词</span>
+        <span onclick="doShelfSearch()">寻</span>
+      </div>
     </div>
+
     <div id="shelf-list"></div>
     <div class="shelf-pagination" id="shelf-pagination"></div>
+    <button class="export-btn" onclick="doExport()">导出全部词条</button>
   </div>
 
   <div class="view" id="view-import">
