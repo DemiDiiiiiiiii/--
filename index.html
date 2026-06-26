@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>拾遗</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&display=swap');
@@ -286,7 +286,6 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   background: #eef3f6;
   border-radius: 2px;
   padding: 12px 14px;
-  margin-left: -14px; margin-right: -14px;
 }
 .notes-section.sub-panel.open {
   padding-top: 12px;
@@ -329,26 +328,48 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
 .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ── 藏书 ── */
-.shelf-bar { display: flex; gap: 8px; margin-bottom: 16px; }
-.shelf-bar input {
-  flex: 1; font-family: inherit; font-size: 14px;
-  padding: 8px 0; border: none;
+.shelf-search-wrap { margin-bottom: 16px; }
+.shelf-input-row {
+  display: flex; align-items: center; gap: 0;
   border-bottom: 1px solid var(--line);
-  background: transparent; color: var(--ink); outline: none;
+  padding-bottom: 8px; margin-bottom: 10px;
 }
-.shelf-bar input:focus { border-color: var(--accent-l); }
-.shelf-bar input::placeholder { color: var(--ink-soft); font-size: 13px; }
-.shelf-bar select {
-  font-family: inherit; font-size: 12px;
-  border: 1px solid var(--line); border-radius: 2px;
-  background: transparent; color: var(--ink-soft); padding: 4px 6px;
+.shelf-input-row input {
+  flex: 1; font-family: inherit; font-size: 14px;
+  border: none; background: transparent; color: var(--ink);
+  outline: none; padding: 0;
 }
-.shelf-bar button {
-  font-family: inherit; font-size: 12px;
-  border: 1px solid var(--accent-l); border-radius: 2px;
-  background: none; color: var(--accent);
-  padding: 4px 14px; cursor: pointer; letter-spacing: 0.15em;
+.shelf-input-row input::placeholder { color: var(--ink-soft); font-size: 13px; }
+.mode-toggle {
+  font-size: 11px; color: var(--ink-soft);
+  cursor: pointer; padding: 0 8px;
+  letter-spacing: 0.05em; flex-shrink: 0;
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  margin: 0 8px;
 }
+.mode-toggle.semantic { color: var(--accent); }
+.shelf-search-btn {
+  font-size: 12px; color: var(--accent);
+  cursor: pointer; letter-spacing: 0.2em;
+  flex-shrink: 0;
+}
+.shelf-filters {
+  display: flex; gap: 16px; align-items: center;
+}
+.filter-tag {
+  font-size: 11px; color: var(--ink-soft);
+  letter-spacing: 0.15em; cursor: pointer;
+}
+.filter-tag:hover { color: var(--accent); }
+.filter-tag.active { color: var(--accent); border-bottom: 1px solid var(--accent); }
+.highlight-filter { color: var(--ink-soft); }
+.highlight-filter:hover { color: var(--gold); }
+.filter-clear {
+  font-size: 11px; color: var(--ink-soft);
+  cursor: pointer; margin-left: auto;
+}
+.filter-clear:hover { color: var(--ink); }
 .shelf-pagination {
   display: flex; justify-content: center; align-items: center;
   gap: 16px; margin-top: 20px;
@@ -374,16 +395,7 @@ textarea#importText:focus { border-color: var(--accent-l); }
 }
 
 /* ── 寻句悬浮 ── */
-.topic-tags {
-  display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
-}
-.topic-tags span {
-  font-family: inherit; font-size: 12px;
-  color: var(--accent); border: 1px solid var(--accent-dim);
-  border-radius: 20px; padding: 3px 14px;
-  cursor: pointer; letter-spacing: 0.1em;
-}
-.topic-tags span:hover { background: var(--accent); color: #f8f7f4; }
+
 .top-fab {
   position: fixed; bottom: 144px; right: 20px;
   width: 44px; height: 44px; border-radius: 50%;
@@ -449,10 +461,10 @@ textarea#importText:focus { border-color: var(--accent-l); }
 }
 
 mark.hl {
-  background: #e8f0e0;
+  background: #e8d9bb;
   color: var(--ink);
   border-radius: 2px;
-  padding: 0 1px;
+  padding: 0 2px;
   cursor: pointer;
 }
 .empty { text-align: center; color: var(--ink-soft); font-size: 13px; padding: 40px 0; letter-spacing: 0.1em; }
@@ -658,10 +670,7 @@ function renderCard(entry, showListen=false) {
   if (entry.note) html += `<div class="note">${escapeHtml(entry.note)}</div>`;
   if (entry.source) html += `<div class="source">${escapeHtml(entry.source)}</div>`;
 
-  const tagList = parseTags(entry.tags);
-  if (tagList.length>0) {
-    html += `<div class="tags">${tagList.map(t=>`<span class="tag" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`).join('')}</div>`;
-  }
+  // 标签不在卡片上显示，只用于藏书页筛选
   if (showListen) html += `<div class="listen-area"><button class="listen-btn">听</button></div>`;
 
   // 查全诗搜索词
@@ -867,20 +876,18 @@ async function saveTags(id, btn) {
   await api(`/api/entry/${id}`, { method:'PUT', body: JSON.stringify({ tags }) });
   const card = btn.closest('.card');
   card.querySelector('.tag-edit-panel').classList.remove('show');
-  let tagDiv = card.querySelector('.tags');
-  const tagList = parseTags(tags);
-  if (tagList.length>0) {
-    if (!tagDiv) {
-      tagDiv = document.createElement('div'); tagDiv.className='tags';
-      (card.querySelector('.source')||card.querySelector('.note')||card.querySelector('.content')).insertAdjacentElement('afterend',tagDiv);
-    }
-    tagDiv.innerHTML = tagList.map(t=>`<span class="tag" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`).join('');
-  } else if (tagDiv) tagDiv.remove();
+  // 标签不显示在卡片上，无需更新
 }
 
 function filterByTag(tag) {
   switchView('shelf');
   document.getElementById('shelfSearch').value = tag;
+  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  // 找到对应的filter-tag并激活
+  document.querySelectorAll('.filter-tag').forEach(t => {
+    if (t.textContent === tag) t.classList.add('active');
+  });
+  document.getElementById('filterClear').style.display = 'inline';
   shelfOffset=0; loadShelf({q:tag,mode:'keyword'});
 }
 
@@ -1066,7 +1073,54 @@ function renderPagination(q) {
   }
 }
 
-async function doShelfSearch() { shelfOffset=0; loadShelf(); }
+let _shelfMode = 'keyword';
+
+function toggleShelfMode() {
+  _shelfMode = _shelfMode === 'keyword' ? 'semantic' : 'keyword';
+  const toggle = document.getElementById('shelfModeToggle');
+  toggle.textContent = _shelfMode === 'keyword' ? '词' : '意';
+  toggle.classList.toggle('semantic', _shelfMode === 'semantic');
+}
+
+async function doShelfSearch() {
+  shelfOffset = 0;
+  document.getElementById('filterClear').style.display = 'none';
+  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  loadShelf();
+}
+
+function clearFilter() {
+  document.getElementById('shelfSearch').value = '';
+  document.getElementById('filterClear').style.display = 'none';
+  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  shelfOffset = 0;
+  loadShelf();
+}
+
+async function showAllHighlights() {
+  const list = document.getElementById('shelf-list');
+  list.innerHTML = '<div class="empty">加载中……</div>';
+  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  document.querySelector('.highlight-filter').classList.add('active');
+  document.getElementById('filterClear').style.display = 'inline';
+
+  // 从后端拿所有有高亮的词条
+  const data = await api('/api/highlights-all');
+  list.innerHTML = '';
+  if (!data.entries || data.entries.length === 0) {
+    list.innerHTML = '<div class="empty">还没有高亮的句子</div>';
+    return;
+  }
+  data.entries.forEach(e => {
+    const card = renderCard(e, false);
+    // 显示该词条的高亮
+    if (e.highlights) {
+      e.highlights.forEach(hl => applyHighlightToCard(card, hl.text, hl.id));
+    }
+    list.appendChild(card);
+  });
+  document.getElementById('shelf-pagination').innerHTML = '';
+}
 
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('shelfSearch').addEventListener('keydown',e=>{
@@ -1169,11 +1223,12 @@ document.addEventListener('selectionchange', () => {
   _highlightEntryId = parseInt(card.dataset.id);
   _highlightText = text;
 
-  // 定位浮层到选中文字附近
+  // fixed定位，viewport坐标，不受scroll影响
   const rect = range.getBoundingClientRect();
+  tooltip.style.position = 'fixed';
   tooltip.style.display = 'block';
-  tooltip.style.top = (rect.bottom + window.scrollY + 6) + 'px';
-  tooltip.style.left = Math.max(10, rect.left + window.scrollX) + 'px';
+  tooltip.style.top = (rect.bottom + 8) + 'px';
+  tooltip.style.left = Math.min(Math.max(10, rect.left), window.innerWidth - 100) + 'px';
 });
 
 async function doHighlight() {
