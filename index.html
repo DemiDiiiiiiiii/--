@@ -328,46 +328,61 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
 .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ── 藏书 ── */
-.shelf-search-wrap { margin-bottom: 20px; }
-.shelf-input-row {
-  display: flex; align-items: center;
+/* 专题标签栏 */
+.shelf-topics {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 20px;
   border-bottom: 1px solid var(--line);
-  padding-bottom: 10px; margin-bottom: 12px;
+  padding-bottom: 12px;
 }
-.shelf-input-row input {
-  flex: 1; font-family: inherit; font-size: 15px;
+.topic-item {
+  font-family: inherit; font-size: 12px;
+  color: var(--ink-soft); letter-spacing: 0.25em;
+  cursor: pointer; padding: 4px 16px;
+  border-right: 1px solid var(--line);
+}
+.topic-item:first-child { padding-left: 0; }
+.topic-item:hover { color: var(--accent); }
+.topic-item.active {
+  color: var(--accent);
+  font-weight: 500;
+}
+.topic-clear {
+  font-size: 11px; color: var(--line);
+  cursor: pointer; margin-left: auto;
+  letter-spacing: 0.1em;
+}
+.topic-clear:hover { color: var(--ink-soft); }
+
+/* 搜索框 */
+.shelf-search-box {
+  display: flex; align-items: center;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+.shelf-search-box input {
+  flex: 1; font-family: inherit; font-size: 14px;
   border: none; background: transparent; color: var(--ink);
-  outline: none; padding: 0; letter-spacing: 0.02em;
+  outline: none; letter-spacing: 0.02em;
 }
-.shelf-input-row input::placeholder { color: var(--line); font-size: 14px; }
-.shelf-search-btn {
-  font-size: 12px; color: var(--ink-soft);
-  cursor: pointer; letter-spacing: 0.3em;
-  flex-shrink: 0; padding-left: 12px;
-}
-.shelf-search-btn:hover { color: var(--accent); }
-.shelf-filters {
+.shelf-search-box input::placeholder { color: var(--line); }
+.shelf-search-actions {
   display: flex; align-items: center; gap: 12px;
+  flex-shrink: 0; padding-left: 12px;
+  border-left: 1px solid var(--line);
 }
-.filter-tag {
-  font-size: 11px; color: var(--ink-soft);
-  letter-spacing: 0.2em; cursor: pointer;
+.shelf-search-actions span {
+  font-size: 12px; color: var(--ink-soft);
+  cursor: pointer; letter-spacing: 0.15em;
 }
-.filter-tag:hover { color: var(--accent); }
-.filter-tag.active { color: var(--accent); }
-.filter-sep { color: var(--line); font-size: 11px; }
-.filter-mode {
-  font-size: 11px; color: var(--line);
-  letter-spacing: 0.1em; cursor: pointer;
-  margin-left: auto;
-}
-.filter-mode:hover { color: var(--ink-soft); }
-.filter-mode.semantic { color: var(--accent-l); }
-.filter-clear {
-  font-size: 11px; color: var(--line);
-  cursor: pointer; letter-spacing: 0.1em;
-}
-.filter-clear:hover { color: var(--ink-soft); }
+.shelf-search-actions span:hover { color: var(--accent); }
+.shelf-search-actions span#shelfModeToggle { color: var(--line); }
+.shelf-search-actions span#shelfModeToggle:hover { color: var(--ink-soft); }
+.shelf-search-actions span#shelfModeToggle.semantic { color: var(--accent-l); }
 .shelf-pagination {
   display: flex; justify-content: center; align-items: center;
   gap: 16px; margin-top: 20px;
@@ -880,9 +895,9 @@ async function saveTags(id, btn) {
 function filterByTag(tag) {
   switchView('shelf');
   document.getElementById('shelfSearch').value = tag;
-  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.topic-item').forEach(t => t.classList.remove('active'));
   // 找到对应的filter-tag并激活
-  document.querySelectorAll('.filter-tag').forEach(t => {
+  document.querySelectorAll('.topic-item').forEach(t => {
     if (t.textContent === tag) t.classList.add('active');
   });
   document.getElementById('filterClear').style.display = 'inline';
@@ -1083,14 +1098,14 @@ function toggleShelfMode() {
 async function doShelfSearch() {
   shelfOffset = 0;
   document.getElementById('filterClear').style.display = 'none';
-  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.topic-item').forEach(t => t.classList.remove('active'));
   loadShelf();
 }
 
 function clearFilter() {
   document.getElementById('shelfSearch').value = '';
   document.getElementById('filterClear').style.display = 'none';
-  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.topic-item').forEach(t => t.classList.remove('active'));
   shelfOffset = 0;
   loadShelf();
 }
@@ -1098,7 +1113,7 @@ function clearFilter() {
 async function showAllHighlights() {
   const list = document.getElementById('shelf-list');
   list.innerHTML = '<div class="empty">加载中……</div>';
-  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.topic-item').forEach(t => t.classList.remove('active'));
   document.querySelector('.highlight-filter').classList.add('active');
   document.getElementById('filterClear').style.display = 'inline';
 
