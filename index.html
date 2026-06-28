@@ -363,7 +363,8 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   border-radius: 2px;
   padding: 10px 14px;
   margin-bottom: 16px;
-  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
 }
 .shelf-search-box #shelfModeToggle {
   font-size: 11px; color: var(--ink-soft);
@@ -371,10 +372,12 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   flex-shrink: 0; white-space: nowrap;
   padding-right: 10px;
   border-right: 1px solid var(--line);
+  margin-right: 10px;
 }
 .shelf-search-box #shelfModeToggle.semantic { color: var(--accent); }
 .shelf-search-box input {
-  flex: 1; font-family: inherit; font-size: 14px;
+  flex: 1; min-width: 0;
+  font-family: inherit; font-size: 14px;
   border: none; background: transparent; color: var(--ink);
   outline: none; letter-spacing: 0.02em;
 }
@@ -384,7 +387,7 @@ main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
   cursor: pointer; letter-spacing: 0.2em;
   flex-shrink: 0; padding-left: 10px;
   border-left: 1px solid var(--line);
-  margin-left: 4px;
+  margin-left: 10px;
 }
 .shelf-seek-btn:hover { color: var(--accent); }
 .shelf-search-actions { display: none; }
@@ -520,7 +523,7 @@ mark.hl {
 
     <div class="shelf-search-box">
       <span id="shelfModeToggle" onclick="toggleShelfMode()">关键词</span>
-      <input type="text" id="shelfSearch" placeholder="搜词句、意思、标记……">
+      <input type="text" id="shelfSearch" placeholder="搜词句、意思、标记……" onkeydown="if(event.key==='Enter')doShelfSearch()">
       <span class="shelf-seek-btn" onclick="doShelfSearch()">寻</span>
     </div>
 
